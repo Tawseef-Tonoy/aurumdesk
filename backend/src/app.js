@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const customerRoutes = require("./routes/customer.routes");
 const goldRateRoutes = require("./routes/goldRate.routes");
+const jewelryItemRoutes = require("./routes/jewelryItem.routes");
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/customers", customerRoutes);
 app.use("/api/gold-rates", goldRateRoutes);
+app.use("/api/jewelry-items", jewelryItemRoutes);
 
 module.exports = app;
