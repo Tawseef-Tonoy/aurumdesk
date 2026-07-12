@@ -5,7 +5,7 @@ const customerRoutes = require("./routes/customer.routes");
 const goldRateRoutes = require("./routes/goldRate.routes");
 
 const expenseRoutes =require("./routes/expense.routes");
-
+const paymentRoutes = require("./routes/payment.routes");
 
 
 
@@ -25,7 +25,7 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/gold-rates", goldRateRoutes);
 
 app.use("/api/expenses", expenseRoutes);
-
+app.use("/api/payments", paymentRoutes);
 
 
 
