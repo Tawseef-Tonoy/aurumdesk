@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 
 const customerRoutes = require("./routes/customer.routes");
+const goldRateRoutes = require("./routes/goldRate.routes");
 
 const app = express();
 
@@ -16,5 +17,6 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/customers", customerRoutes);
+app.use("/api/gold-rates", goldRateRoutes);
 
 module.exports = app;
