@@ -34,6 +34,43 @@ function MainLayout() {
           >
             Customers
           </NavLink>
+
+
+          <NavLink
+            to="/gold-rates"
+            className={({ isActive }) =>
+              `sidebar-link ${
+                isActive ? "active" : ""
+              }`
+            }
+          >
+            Gold Rates
+          </NavLink>
+
+          <NavLink
+            to="/expenses"
+            className={({ isActive }) =>
+              `sidebar-link ${
+                isActive ? "active" : ""
+              }`
+            }
+          >
+              Expenses
+          </NavLink>
+
+
+          <NavLink
+              to="/payments"
+              className={({ isActive }) =>
+                `sidebar-link ${
+                  isActive ? "active" : ""
+                }`
+              }
+          >
+              Payments
+          </NavLink>
+
+
         </nav>
       </aside>
 

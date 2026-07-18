@@ -35,6 +35,111 @@ function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Gold Rate Card */}
+        <div className="col-md-6 col-xl-4">
+
+          <div className="card page-card h-100">
+
+            <div className="card-body">
+
+
+              <h2 className="h5">
+                Gold Rates
+              </h2>
+
+
+
+              <p className="text-muted">
+                Manage daily gold prices,
+                purity, and active rates.
+              </p>
+
+
+
+              <Link
+                to="/gold-rates"
+                className="btn btn-dark"
+              >
+                Open gold rates
+              </Link>
+
+
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div className="col-md-6 col-xl-4">
+
+          <div className="card page-card h-100">
+
+              <div className="card-body">
+
+                  <h2 className="h5">
+                      Expenses
+                  </h2>
+
+
+                  <p className="text-muted">
+                      Manage business expenses,
+                      payments, and expense status.
+                  </p>
+
+
+                  <Link
+                  to="/expenses"
+                  className="btn btn-dark"
+                  >
+                      Open expenses
+                  </Link>
+
+
+              </div>
+
+          </div>
+
+      </div>
+
+      <div className="col-md-6 col-xl-4">
+
+        <div className="card page-card h-100">
+
+            <div className="card-body">
+
+                <h2 className="h5">
+                    Payments
+                </h2>
+
+
+                <p className="text-muted">
+                    Manage customer payment
+                    collections and records.
+                </p>
+
+
+                <Link
+                to="/payments"
+                className="btn btn-dark"
+                >
+                    Open payments
+                </Link>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
       </div>
     </section>
   );
