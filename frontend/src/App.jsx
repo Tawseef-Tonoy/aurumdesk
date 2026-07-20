@@ -22,6 +22,11 @@ import PaymentsPage from "./features/payments/PaymentsPage";
 import PaymentFormPage from "./features/payments/PaymentFormPage";
 import PaymentEditPage from "./features/payments/PaymentEditPage";
 
+import SalesPage from "./features/sales/SalesPage";
+import SaleFormPage from "./features/sales/SaleFormPage";
+import SaleDetailsPage from "./features/sales/SaleDetailsPage";
+
+
 
 function App() {
   return (
@@ -97,6 +102,20 @@ function App() {
         />
 
 
+        <Route
+          path="sales"
+          element={<SalesPage />}
+        />
+
+        <Route
+          path="sales/new"
+          element={<SaleFormPage />}
+        />
+
+        <Route
+          path="/sales/:id"
+          element={<SaleDetailsPage/>}
+        />
 
         <Route
           path="*"

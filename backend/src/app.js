@@ -7,7 +7,8 @@ const jewelryItemRoutes = require("./routes/jewelryItem.routes");
 
 const expenseRoutes =require("./routes/expense.routes");
 const paymentRoutes = require("./routes/payment.routes");
-
+const priceCalculationRoutes = require("./routes/priceCalculation.routes");
+const saleRoutes = require("./routes/sale.routes");
 
 
 const app = express();
@@ -28,7 +29,8 @@ app.use("/api/jewelry-items", jewelryItemRoutes);
 
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/payments", paymentRoutes);
-
+app.use("/api/price-calculation", priceCalculationRoutes);
+app.use("/api/sales", saleRoutes);
 
 
 module.exports = app;

@@ -69,7 +69,18 @@ function MainLayout() {
           >
               Payments
           </NavLink>
-
+          
+          
+          <NavLink
+            to="/sales"
+            className={({ isActive }) =>
+              `sidebar-link ${
+                isActive ? "active" : ""
+              }`
+            }
+          >
+            Sales
+          </NavLink>
 
         </nav>
       </aside>
