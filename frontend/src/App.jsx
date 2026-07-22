@@ -29,6 +29,10 @@ import SaleDetailsPage from "./features/sales/SaleDetailsPage";
 import InventoryPage from "./features/inventory/InventoryPage";
 import InventoryFormPage from "./features/inventory/InventoryFormPage";
 
+import StockAdjustmentsPage from "./features/stockAdjustments/StockAdjustmentsPage";
+import StockAdjustmentFormPage from "./features/stockAdjustments/StockAdjustmentFormPage";
+import StockAdjustmentDetailsPage from "./features/stockAdjustments/StockAdjustmentDetailsPage";
+
 
 
 function App() {
@@ -137,6 +141,21 @@ function App() {
         <Route
           path="inventory/:id/edit"
           element={<InventoryFormPage />}
+        />
+
+        <Route
+          path="stock-adjustments"
+          element={<StockAdjustmentsPage />}
+        />
+
+        <Route
+          path="stock-adjustments/new"
+          element={<StockAdjustmentFormPage />}
+        />
+
+        <Route
+          path="stock-adjustments/:id"
+          element={<StockAdjustmentDetailsPage />}
         />
 
       </Route>

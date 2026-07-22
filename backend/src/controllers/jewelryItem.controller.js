@@ -235,13 +235,20 @@ async function updateJewelryItem(req, res) {
       "makingChargeType",
       "makingChargeAmount",
       "purchaseCost",
-      "quantity",
       "minStockLevel",
       "imageUrl",
       "supplierReference",
       "status",
     ];
 
+    if (req.body.quantity !== undefined) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Inventory quantity cannot be edited directly. Use Stock Adjustment.",
+      });
+    }
+    
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
         item[field] = req.body[field];
