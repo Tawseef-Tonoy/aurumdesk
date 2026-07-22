@@ -4,6 +4,11 @@ import {
 } from "react-router-dom";
 
 function MainLayout() {
+  const getLinkClass = ({ isActive }) =>
+    `sidebar-link ${
+      isActive ? "active" : ""
+    }`;
+
   return (
     <div className="app-layout">
       <aside className="sidebar">
@@ -15,73 +20,52 @@ function MainLayout() {
           <NavLink
             to="/"
             end
-            className={({ isActive }) =>
-              `sidebar-link ${
-                isActive ? "active" : ""
-              }`
-            }
+            className={getLinkClass}
           >
             Dashboard
           </NavLink>
 
           <NavLink
             to="/customers"
-            className={({ isActive }) =>
-              `sidebar-link ${
-                isActive ? "active" : ""
-              }`
-            }
+            className={getLinkClass}
           >
             Customers
           </NavLink>
 
+          <NavLink
+            to="/inventory"
+            className={getLinkClass}
+          >
+            Inventory
+          </NavLink>
 
           <NavLink
             to="/gold-rates"
-            className={({ isActive }) =>
-              `sidebar-link ${
-                isActive ? "active" : ""
-              }`
-            }
+            className={getLinkClass}
           >
             Gold Rates
           </NavLink>
 
           <NavLink
             to="/expenses"
-            className={({ isActive }) =>
-              `sidebar-link ${
-                isActive ? "active" : ""
-              }`
-            }
+            className={getLinkClass}
           >
-              Expenses
+            Expenses
           </NavLink>
-
 
           <NavLink
-              to="/payments"
-              className={({ isActive }) =>
-                `sidebar-link ${
-                  isActive ? "active" : ""
-                }`
-              }
+            to="/payments"
+            className={getLinkClass}
           >
-              Payments
+            Payments
           </NavLink>
-          
-          
+
           <NavLink
             to="/sales"
-            className={({ isActive }) =>
-              `sidebar-link ${
-                isActive ? "active" : ""
-              }`
-            }
+            className={getLinkClass}
           >
             Sales
           </NavLink>
-
         </nav>
       </aside>
 
