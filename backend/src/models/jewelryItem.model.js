@@ -86,11 +86,7 @@ const jewelryItemSchema = new mongoose.Schema(
       min: [0, "Purchase cost cannot be negative"],
     },
 
-    sellingPrice: {
-      type: Number,
-      default: 0,
-      min: [0, "Selling price cannot be negative"],
-    },
+    
 
     quantity: {
       type: Number,
