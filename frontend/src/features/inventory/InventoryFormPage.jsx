@@ -97,18 +97,16 @@ function prettify(value) {
     .replaceAll("_", " ")
     .replace(
       /\b\w/g,
-      (letter) => letter.toUpperCase()
+      (letter) =>
+        letter.toUpperCase()
     );
 }
 
 function InventoryFormPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
-  const navigate =
-    useNavigate();
-
-  const isEdit =
-    Boolean(id);
+  const isEdit = Boolean(id);
 
   const [formData, setFormData] =
     useState(emptyForm);
@@ -349,6 +347,7 @@ function InventoryFormPage() {
       if (isEdit) {
         const {
           sku,
+          quantity,
           _id,
           netGoldWeight,
           createdAt,
@@ -851,8 +850,33 @@ function InventoryFormPage() {
                   onChange={
                     handleChange
                   }
+                  disabled={
+                    isEdit
+                  }
                   required
                 />
+
+                {isEdit && (
+                  <div className="mt-2">
+                    <div className="form-text mb-2">
+                      Quantity cannot be
+                      changed from the
+                      inventory edit
+                      form. Use Stock
+                      Adjustments so the
+                      change is recorded
+                      in the audit log.
+                    </div>
+
+                    <Link
+                      to="/stock-adjustments/new"
+                      className="btn btn-sm btn-outline-primary"
+                    >
+                      Create stock
+                      adjustment
+                    </Link>
+                  </div>
+                )}
               </div>
 
               <div className="col-md-4">

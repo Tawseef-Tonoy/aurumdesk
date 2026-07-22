@@ -66,6 +66,12 @@ function MainLayout() {
           >
             Sales
           </NavLink>
+          <NavLink
+            to="/stock-adjustments"
+            className={getLinkClass}
+          >
+            Stock Adjustments
+          </NavLink>
         </nav>
       </aside>
 
