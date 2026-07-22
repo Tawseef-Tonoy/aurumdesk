@@ -26,6 +26,9 @@ import SalesPage from "./features/sales/SalesPage";
 import SaleFormPage from "./features/sales/SaleFormPage";
 import SaleDetailsPage from "./features/sales/SaleDetailsPage";
 
+import InventoryPage from "./features/inventory/InventoryPage";
+import InventoryFormPage from "./features/inventory/InventoryFormPage";
+
 
 
 function App() {
@@ -113,7 +116,7 @@ function App() {
         />
 
         <Route
-          path="/sales/:id"
+          path="sales/:id"
           element={<SaleDetailsPage/>}
         />
 
@@ -121,6 +124,21 @@ function App() {
           path="*"
           element={<NotFoundPage />}
         />
+        <Route
+          path="inventory"
+          element={<InventoryPage />}
+        />
+
+        <Route
+          path="inventory/new"
+          element={<InventoryFormPage />}
+        />
+
+        <Route
+          path="inventory/:id/edit"
+          element={<InventoryFormPage />}
+        />
+
       </Route>
     </Routes>
   );
