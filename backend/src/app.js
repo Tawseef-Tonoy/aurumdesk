@@ -14,6 +14,9 @@ const stockAdjustmentRoutes = require(
   "./routes/stockAdjustment.routes"
 );
 
+const lowStockAlertRoutes = require(
+  "./routes/lowStockAlert.routes"
+);
 
 const app = express();
 
@@ -26,6 +29,11 @@ app.get("/api/health", (req, res) => {
     message: "AurumDesk backend is running",
   });
 });
+
+app.use(
+  "/api/low-stock-alerts",
+  lowStockAlertRoutes
+);
 
 app.use("/api/customers", customerRoutes);
 app.use("/api/gold-rates", goldRateRoutes);

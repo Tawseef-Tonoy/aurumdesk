@@ -8,8 +8,15 @@ const StockAdjustment = require(
   "../models/stockAdjustment.model"
 );
 
+const {
+  syncLowStockAlertForItem,
+} = require(
+  "../services/lowStockAlert.service"
+);
+
 function generateAdjustmentId() {
   const timestamp = Date.now();
+
   const randomPart = Math.floor(
     1000 + Math.random() * 9000
   );
@@ -23,15 +30,40 @@ function calculateNewQuantity(
   adjustmentAmount
 ) {
   if (direction === "INCREASE") {
-    return previousQuantity + adjustmentAmount;
+    return (
+      previousQuantity +
+      adjustmentAmount
+    );
   }
 
-  return previousQuantity - adjustmentAmount;
+  return (
+    previousQuantity -
+    adjustmentAmount
+  );
 }
 
-// Create an adjustment and update inventory.
-async function createStockAdjustment(req, res) {
-  const session = await mongoose.startSession();
+async function safelySyncLowStockAlert(
+  itemId
+) {
+  try {
+    await syncLowStockAlertForItem(
+      itemId
+    );
+  } catch (error) {
+    console.error(
+      "Low-stock synchronization failed:",
+      error
+    );
+  }
+}
+
+// Create a stock adjustment and update inventory.
+async function createStockAdjustment(
+  req,
+  res
+) {
+  const session =
+    await mongoose.startSession();
 
   try {
     const {
@@ -56,14 +88,46 @@ async function createStockAdjustment(req, res) {
       });
     }
 
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        jewelryItem
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid jewelry item ID",
+      });
+    }
+
     const normalizedDirection =
-      String(direction).toUpperCase();
+      String(direction)
+        .trim()
+        .toUpperCase();
 
     const normalizedReason =
-      String(reason).toUpperCase();
+      String(reason)
+        .trim()
+        .toUpperCase();
+
+    const allowedDirections = [
+      "INCREASE",
+      "DECREASE",
+    ];
+
+    const allowedReasons = [
+      "PHYSICAL_COUNT_CORRECTION",
+      "DAMAGED_ITEM",
+      "LOST_ITEM",
+      "FOUND_ITEM",
+      "DATA_ENTRY_CORRECTION",
+      "SUPPLIER_CORRECTION",
+      "RETURN_OR_REPAIR",
+      "OTHER",
+    ];
 
     if (
-      !["INCREASE", "DECREASE"].includes(
+      !allowedDirections.includes(
         normalizedDirection
       )
     ) {
@@ -74,11 +138,25 @@ async function createStockAdjustment(req, res) {
       });
     }
 
+    if (
+      !allowedReasons.includes(
+        normalizedReason
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid stock adjustment reason",
+      });
+    }
+
     const numericAmount =
       Number(adjustmentAmount);
 
     if (
-      !Number.isInteger(numericAmount) ||
+      !Number.isInteger(
+        numericAmount
+      ) ||
       numericAmount <= 0
     ) {
       return res.status(400).json({
@@ -90,104 +168,139 @@ async function createStockAdjustment(req, res) {
 
     let createdAdjustment;
 
-    await session.withTransaction(async () => {
-      const item = await JewelryItem.findById(
-        jewelryItem
-      ).session(session);
+    await session.withTransaction(
+      async () => {
+        const item =
+          await JewelryItem.findById(
+            jewelryItem
+          ).session(session);
 
-      if (!item) {
-        const error = new Error(
-          "Jewelry item not found"
-        );
+        if (!item) {
+          const error = new Error(
+            "Jewelry item not found"
+          );
 
-        error.statusCode = 404;
-        throw error;
-      }
+          error.statusCode = 404;
 
-      if (item.status === "INACTIVE") {
-        const error = new Error(
-          "Inactive inventory items cannot be adjusted"
-        );
+          throw error;
+        }
 
-        error.statusCode = 400;
-        throw error;
-      }
+        if (
+          item.status ===
+          "INACTIVE"
+        ) {
+          const error = new Error(
+            "Inactive inventory items cannot be adjusted"
+          );
 
-      const previousQuantity =
-        Number(item.quantity);
+          error.statusCode = 400;
 
-      const newQuantity =
-        calculateNewQuantity(
-          previousQuantity,
-          normalizedDirection,
-          numericAmount
-        );
+          throw error;
+        }
 
-      if (newQuantity < 0) {
-        const error = new Error(
-          `Stock cannot become negative. Current quantity is ${previousQuantity}.`
-        );
+        const previousQuantity =
+          Number(item.quantity);
 
-        error.statusCode = 400;
-        throw error;
-      }
+        const newQuantity =
+          calculateNewQuantity(
+            previousQuantity,
+            normalizedDirection,
+            numericAmount
+          );
 
-      item.quantity = newQuantity;
+        if (newQuantity < 0) {
+          const error = new Error(
+            `Stock cannot become negative. Current quantity is ${previousQuantity}.`
+          );
 
-      await item.save({
-        session,
-        validateBeforeSave: true,
-      });
+          error.statusCode = 400;
 
-      const adjustmentDocuments =
-        await StockAdjustment.create(
-          [
+          throw error;
+        }
+
+        item.quantity =
+          newQuantity;
+
+        await item.save({
+          session,
+          validateBeforeSave: true,
+        });
+
+        const adjustmentDocuments =
+          await StockAdjustment.create(
+            [
+              {
+                adjustmentId:
+                  generateAdjustmentId(),
+
+                jewelryItem:
+                  item._id,
+
+                direction:
+                  normalizedDirection,
+
+                adjustmentAmount:
+                  numericAmount,
+
+                previousQuantity,
+
+                newQuantity,
+
+                reason:
+                  normalizedReason,
+
+                notes:
+                  String(
+                    notes || ""
+                  ).trim(),
+
+                adjustedBy:
+                  String(
+                    adjustedBy ||
+                      "SYSTEM"
+                  ).trim(),
+
+                requestIp:
+                  req.ip || "",
+
+                userAgent:
+                  req.get(
+                    "user-agent"
+                  ) || "",
+              },
+            ],
             {
-              adjustmentId:
-                generateAdjustmentId(),
+              session,
+            }
+          );
 
-              jewelryItem: item._id,
+        createdAdjustment =
+          adjustmentDocuments[0];
+      }
+    );
 
-              direction:
-                normalizedDirection,
-
-              adjustmentAmount:
-                numericAmount,
-
-              previousQuantity,
-
-              newQuantity,
-
-              reason:
-                normalizedReason,
-
-              notes,
-
-              adjustedBy,
-
-              requestIp:
-                req.ip || "",
-
-              userAgent:
-                req.get("user-agent") ||
-                "",
-            },
-          ],
-          {
-            session,
-          }
-        );
-
-      createdAdjustment =
-        adjustmentDocuments[0];
-    });
+    /*
+     * Synchronize the low-stock alert only after
+     * the stock transaction has committed.
+     */
+    await safelySyncLowStockAlert(
+      createdAdjustment.jewelryItem
+    );
 
     const populatedAdjustment =
       await StockAdjustment.findById(
         createdAdjustment._id
       ).populate(
         "jewelryItem",
-        "sku name category purity quantity status"
+        [
+          "sku",
+          "name",
+          "category",
+          "purity",
+          "quantity",
+          "minStockLevel",
+          "status",
+        ].join(" ")
       );
 
     return res.status(201).json({
@@ -202,18 +315,10 @@ async function createStockAdjustment(req, res) {
       error
     );
 
-    const statusCode =
-      error.statusCode || 500;
-
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid jewelry item ID",
-      });
-    }
-
-    if (error.name === "ValidationError") {
+    if (
+      error.name ===
+      "ValidationError"
+    ) {
       return res.status(400).json({
         success: false,
         message:
@@ -222,19 +327,45 @@ async function createStockAdjustment(req, res) {
       });
     }
 
-    return res.status(statusCode).json({
-      success: false,
-      message:
-        error.message ||
-        "Failed to create stock adjustment",
-    });
+    if (
+      error.name ===
+      "CastError"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid jewelry item ID",
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Duplicate stock adjustment ID. Please try again.",
+      });
+    }
+
+    return res
+      .status(
+        error.statusCode || 500
+      )
+      .json({
+        success: false,
+        message:
+          error.message ||
+          "Failed to create stock adjustment",
+      });
   } finally {
     await session.endSession();
   }
 }
 
-// List adjustment history.
-async function getStockAdjustments(req, res) {
+// List stock adjustment history.
+async function getStockAdjustments(
+  req,
+  res
+) {
   try {
     const {
       search,
@@ -248,31 +379,85 @@ async function getStockAdjustments(req, res) {
     const filter = {};
 
     if (jewelryItem) {
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          jewelryItem
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid jewelry item ID",
+        });
+      }
+
       filter.jewelryItem =
         jewelryItem;
     }
 
     if (direction) {
       filter.direction =
-        String(direction).toUpperCase();
+        String(direction)
+          .trim()
+          .toUpperCase();
     }
 
     if (reason) {
       filter.reason =
-        String(reason).toUpperCase();
+        String(reason)
+          .trim()
+          .toUpperCase();
     }
 
     if (dateFrom || dateTo) {
       filter.createdAt = {};
 
       if (dateFrom) {
-        filter.createdAt.$gte =
+        const startDate =
           new Date(dateFrom);
+
+        if (
+          Number.isNaN(
+            startDate.getTime()
+          )
+        ) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+              message:
+                "Invalid start date",
+            });
+        }
+
+        startDate.setHours(
+          0,
+          0,
+          0,
+          0
+        );
+
+        filter.createdAt.$gte =
+          startDate;
       }
 
       if (dateTo) {
         const endDate =
           new Date(dateTo);
+
+        if (
+          Number.isNaN(
+            endDate.getTime()
+          )
+        ) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+              message:
+                "Invalid end date",
+            });
+        }
 
         endDate.setHours(
           23,
@@ -286,33 +471,31 @@ async function getStockAdjustments(req, res) {
       }
     }
 
-    let itemIds;
-
     if (search) {
       const matchingItems =
         await JewelryItem.find({
           $or: [
             {
               sku: {
-                $regex: search,
+                $regex:
+                  String(search).trim(),
                 $options: "i",
               },
             },
             {
               name: {
-                $regex: search,
+                $regex:
+                  String(search).trim(),
                 $options: "i",
               },
             },
           ],
         }).select("_id");
 
-      itemIds = matchingItems.map(
-        (item) => item._id
-      );
-
       filter.jewelryItem = {
-        $in: itemIds,
+        $in: matchingItems.map(
+          (item) => item._id
+        ),
       };
     }
 
@@ -322,7 +505,15 @@ async function getStockAdjustments(req, res) {
       )
         .populate(
           "jewelryItem",
-          "sku name category purity quantity status"
+          [
+            "sku",
+            "name",
+            "category",
+            "purity",
+            "quantity",
+            "minStockLevel",
+            "status",
+          ].join(" ")
         )
         .sort({
           createdAt: -1,
@@ -349,18 +540,38 @@ async function getStockAdjustments(req, res) {
   }
 }
 
-// Get one audit record.
+// Get one stock adjustment.
 async function getStockAdjustmentById(
   req,
   res
 ) {
   try {
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        req.params.id
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid stock adjustment ID",
+      });
+    }
+
     const adjustment =
       await StockAdjustment.findById(
         req.params.id
       ).populate(
         "jewelryItem",
-        "sku name category purity quantity status"
+        [
+          "sku",
+          "name",
+          "category",
+          "purity",
+          "quantity",
+          "minStockLevel",
+          "status",
+        ].join(" ")
       );
 
     if (!adjustment) {
@@ -381,14 +592,6 @@ async function getStockAdjustmentById(
       error
     );
 
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid stock adjustment ID",
-      });
-    }
-
     return res.status(500).json({
       success: false,
       message:
@@ -398,15 +601,30 @@ async function getStockAdjustmentById(
   }
 }
 
-// Get history for one inventory item.
+// Get adjustment history for one inventory item.
 async function getItemStockAdjustments(
   req,
   res
 ) {
   try {
+    const { itemId } =
+      req.params;
+
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        itemId
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid jewelry item ID",
+      });
+    }
+
     const item =
       await JewelryItem.findById(
-        req.params.itemId
+        itemId
       );
 
     if (!item) {
@@ -423,7 +641,15 @@ async function getItemStockAdjustments(
       })
         .populate(
           "jewelryItem",
-          "sku name category purity quantity status"
+          [
+            "sku",
+            "name",
+            "category",
+            "purity",
+            "quantity",
+            "minStockLevel",
+            "status",
+          ].join(" ")
         )
         .sort({
           createdAt: -1,
@@ -436,8 +662,14 @@ async function getItemStockAdjustments(
         _id: item._id,
         sku: item.sku,
         name: item.name,
+        category:
+          item.category,
         quantity:
           item.quantity,
+        minStockLevel:
+          item.minStockLevel,
+        status:
+          item.status,
       },
 
       count:
@@ -450,14 +682,6 @@ async function getItemStockAdjustments(
       "Get item stock history error:",
       error
     );
-
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid jewelry item ID",
-      });
-    }
 
     return res.status(500).json({
       success: false,

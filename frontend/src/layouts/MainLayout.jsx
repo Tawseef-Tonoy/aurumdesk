@@ -72,6 +72,13 @@ function MainLayout() {
           >
             Stock Adjustments
           </NavLink>
+
+          <NavLink
+            to="/low-stock-alerts"
+            className={getLinkClass}
+          >
+            Low Stock Alerts
+          </NavLink>
         </nav>
       </aside>
 

@@ -33,6 +33,8 @@ import StockAdjustmentsPage from "./features/stockAdjustments/StockAdjustmentsPa
 import StockAdjustmentFormPage from "./features/stockAdjustments/StockAdjustmentFormPage";
 import StockAdjustmentDetailsPage from "./features/stockAdjustments/StockAdjustmentDetailsPage";
 
+import LowStockAlertsPage from "./features/lowStockAlerts/LowStockAlertsPage";
+
 
 
 function App() {
@@ -156,6 +158,11 @@ function App() {
         <Route
           path="stock-adjustments/:id"
           element={<StockAdjustmentDetailsPage />}
+        />
+
+        <Route
+          path="low-stock-alerts"
+          element={<LowStockAlertsPage />}
         />
 
       </Route>
