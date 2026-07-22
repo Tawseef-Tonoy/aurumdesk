@@ -10,6 +10,19 @@ import NotFoundPage from "./pages/NotFoundPage";
 import CustomersPage from "./features/customers/CustomersPage";
 import CustomerFormPage from "./features/customers/CustomerFormPage";
 
+import GoldRatesPage from "./features/goldRates/GoldRatesPage";
+import GoldRateFormPage from "./features/goldRates/GoldRateFormPage";
+import GoldRateEditPage from "./features/goldRates/GoldRateEditPage";
+
+import ExpensesPage from "./features/expenses/ExpensesPage";
+import ExpenseFormPage from "./features/expenses/ExpenseFormPage";
+import ExpenseEditPage from "./features/expenses/ExpenseEditPage";
+
+import PaymentsPage from "./features/payments/PaymentsPage";
+import PaymentFormPage from "./features/payments/PaymentFormPage";
+import PaymentEditPage from "./features/payments/PaymentEditPage";
+
+
 function App() {
   return (
     <Routes>
@@ -33,6 +46,57 @@ function App() {
           path="customers/:id/edit"
           element={<CustomerFormPage />}
         />
+        
+        <Route
+          path="gold-rates"
+          element={<GoldRatesPage />}
+        />
+
+        <Route
+          path="gold-rates/new"
+          element={<GoldRateFormPage />}
+        />
+
+        <Route
+          path="gold-rates/:id/edit"
+          element={<GoldRateEditPage />}
+        />
+
+        <Route
+          path="expenses"
+          element={<ExpensesPage />}
+        />
+
+
+        <Route
+          path="expenses/new"
+          element={<ExpenseFormPage />}
+        />
+
+
+        <Route
+          path="expenses/:id/edit"
+          element={<ExpenseEditPage />}
+        />
+        
+        <Route
+          path="payments"
+          element={<PaymentsPage />}
+        />
+
+
+        <Route
+            path="payments/new"
+            element={<PaymentFormPage />}
+        />
+
+
+        <Route
+            path="payments/:id/edit"
+            element={<PaymentEditPage />}
+        />
+
+
 
         <Route
           path="*"
