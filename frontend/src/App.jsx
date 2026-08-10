@@ -35,7 +35,9 @@ import StockAdjustmentDetailsPage from "./features/stockAdjustments/StockAdjustm
 
 import LowStockAlertsPage from "./features/lowStockAlerts/LowStockAlertsPage";
 
-
+import CustomOrdersPage from "./features/customOrders/CustomOrdersPage";
+import CustomOrderFormPage from "./features/customOrders/CustomOrderFormPage";
+import CustomOrderDetailsPage from "./features/customOrders/CustomOrderDetailsPage";
 
 function App() {
   return (
@@ -164,6 +166,27 @@ function App() {
           path="low-stock-alerts"
           element={<LowStockAlertsPage />}
         />
+
+        <Route 
+          path="custom-orders" 
+          element={<CustomOrdersPage/>}
+        />
+
+        <Route 
+          path="custom-orders/new" 
+          element={<CustomOrderFormPage/>}
+        />
+        
+        <Route 
+          path="custom-orders/:id" 
+          element={<CustomOrderDetailsPage/>}
+        />
+
+        <Route 
+          path="custom-orders/:id/edit" 
+          element={<CustomOrderFormPage/>}
+        />
+
 
       </Route>
     </Routes>

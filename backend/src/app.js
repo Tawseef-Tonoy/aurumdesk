@@ -10,6 +10,9 @@ const paymentRoutes = require("./routes/payment.routes");
 const priceCalculationRoutes = require("./routes/priceCalculation.routes");
 const saleRoutes = require("./routes/sale.routes");
 
+const customOrderRoutes=require("./routes/customOrder.routes");
+
+
 const stockAdjustmentRoutes = require(
   "./routes/stockAdjustment.routes"
 );
@@ -47,6 +50,7 @@ app.use(
   "/api/stock-adjustments",
   stockAdjustmentRoutes
 );
+app.use("/api/custom-orders",customOrderRoutes);
 
 
 module.exports = app;
