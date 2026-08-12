@@ -1,5 +1,24 @@
+const mongoose = require("mongoose");
+
 const Sale=require("../models/sale.model");
 const JewelryItem=require("../models/jewelryItem.model");
+
+
+function generateInvoiceNumber() {
+  const date = new Date()
+    .toISOString()
+    .slice(0, 10)
+    .replaceAll("-", "");
+
+  const uniquePart =
+    new mongoose.Types.ObjectId()
+      .toString()
+      .slice(-6)
+      .toUpperCase();
+
+  return `INV-${date}-${uniquePart}`;
+}
+
 
 const createSale=async(req,res)=>{
 try{
@@ -16,9 +35,12 @@ return res.status(400).json({message:`${jewelry.name} is not available`});
 
 }
 
-const sale=await Sale.create({
-...req.body,
-status:"DRAFT"
+const invoiceNumber = generateInvoiceNumber();
+
+const sale = await Sale.create({
+  ...req.body,
+  invoiceNumber,
+  status: "DRAFT",
 });
 
 res.status(201).json({
@@ -96,42 +118,146 @@ res.status(500).json({message:error.message});
 };
 
 
-const confirmSale=async(req,res)=>{
-try{
+const confirmSale = async (req, res) => {
+  const session = await mongoose.startSession();
 
-const sale=await Sale.findById(req.params.id);
+  try {
+    let confirmedSale;
 
-if(!sale)
-return res.status(404).json({message:"Invoice not found"});
+    await session.withTransaction(async () => {
+      const sale = await Sale.findById(
+        req.params.id
+      ).session(session);
 
-if(sale.status!=="DRAFT")
-return res.status(400).json({message:"Only draft invoice can be confirmed"});
+      if (!sale) {
+        const error = new Error(
+          "Invoice not found"
+        );
+        error.statusCode = 404;
+        throw error;
+      }
 
+      if (sale.status !== "DRAFT") {
+        const error = new Error(
+          "Only draft invoice can be confirmed"
+        );
+        error.statusCode = 400;
+        throw error;
+      }
 
-for(const item of sale.items){
+     
+      const requiredQuantities = new Map();
 
-await JewelryItem.findByIdAndUpdate(
-item.jewelryItem,
-{status:"SOLD"}
-);
+      for (const item of sale.items) {
+        const itemId =
+          item.jewelryItem.toString();
 
-}
+        const currentRequired =
+          requiredQuantities.get(itemId) || 0;
 
+        requiredQuantities.set(
+          itemId,
+          currentRequired + Number(item.quantity)
+        );
+      }
 
-sale.status="CONFIRMED";
+      
+      const inventoryItems = [];
 
-await sale.save();
+      for (const [
+        itemId,
+        requiredQuantity,
+      ] of requiredQuantities) {
+        const jewelry =
+          await JewelryItem.findById(
+            itemId
+          ).session(session);
 
+        if (!jewelry) {
+          const error = new Error(
+            "Jewelry item not found in inventory"
+          );
+          error.statusCode = 404;
+          throw error;
+        }
 
-res.json({
-message:"Invoice confirmed",
-sale
-});
+        if (
+          jewelry.status !== "AVAILABLE"
+        ) {
+          const error = new Error(
+            `${jewelry.name} is not available`
+          );
+          error.statusCode = 400;
+          throw error;
+        }
 
-}catch(error){
-res.status(500).json({message:error.message});
-}
+        if (
+          jewelry.quantity <
+          requiredQuantity
+        ) {
+          const error = new Error(
+            `Not enough stock for ${jewelry.name}. Requested: ${requiredQuantity}, Available: ${jewelry.quantity}`
+          );
+          error.statusCode = 400;
+          throw error;
+        }
 
+        inventoryItems.push({
+          jewelry,
+          requiredQuantity,
+        });
+      }
+
+      
+      for (const {
+        jewelry,
+        requiredQuantity,
+      } of inventoryItems) {
+        jewelry.quantity -=
+          requiredQuantity;
+
+        jewelry.status =
+          jewelry.quantity === 0
+            ? "SOLD"
+            : "AVAILABLE";
+
+        await jewelry.save({
+          session,
+          validateBeforeSave: true,
+        });
+      }
+
+      sale.status = "CONFIRMED";
+
+      await sale.save({
+        session,
+        validateBeforeSave: true,
+      });
+
+      confirmedSale = sale;
+    });
+
+    return res.status(200).json({
+      message:
+        "Invoice confirmed and inventory updated",
+      sale: confirmedSale,
+    });
+  } catch (error) {
+    console.error(
+      "Confirm sale error:",
+      error
+    );
+
+    return res
+      .status(error.statusCode || 500)
+      .json({
+        message:
+          error.message ||
+          "Failed to confirm invoice",
+      });
+  } finally {
+    await session.endSession();
+  }
 };
 
 

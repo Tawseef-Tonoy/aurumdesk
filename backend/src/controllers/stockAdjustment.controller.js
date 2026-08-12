@@ -221,6 +221,20 @@ async function createStockAdjustment(
         item.quantity =
           newQuantity;
 
+        if (
+          item.status === "SOLD" &&
+          newQuantity > 0
+        ) {
+          item.status = "AVAILABLE";
+        }
+
+        if (
+          item.status === "AVAILABLE" &&
+          newQuantity === 0
+        ) {
+          item.status = "SOLD";
+        }
+
         await item.save({
           session,
           validateBeforeSave: true,
