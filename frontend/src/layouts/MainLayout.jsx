@@ -79,6 +79,16 @@ function MainLayout() {
           >
             Low Stock Alerts
           </NavLink>
+
+          <NavLink
+            to="/custom-orders"
+            className={getLinkClass}
+          >
+            Custom Orders
+          </NavLink>
+
+
+          
         </nav>
       </aside>
 
