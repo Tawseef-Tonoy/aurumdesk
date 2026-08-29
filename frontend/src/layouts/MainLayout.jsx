@@ -66,6 +66,7 @@ function MainLayout() {
           >
             Sales
           </NavLink>
+
           <NavLink
             to="/stock-adjustments"
             className={getLinkClass}
@@ -101,8 +102,12 @@ function MainLayout() {
             EMI Installments
           </NavLink>
 
-
-          
+          <NavLink
+            to="/emi-risk"
+            className={getLinkClass}
+          >
+            AI EMI Risk Checker
+          </NavLink>
         </nav>
       </aside>
 
