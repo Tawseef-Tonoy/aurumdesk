@@ -11,6 +11,9 @@ const priceCalculationRoutes = require("./routes/priceCalculation.routes");
 const saleRoutes = require("./routes/sale.routes");
 
 const customOrderRoutes=require("./routes/customOrder.routes");
+const emiPlanRoutes = require(
+  "./routes/emiPlan.routes"
+);
 
 
 const stockAdjustmentRoutes = require(
@@ -51,6 +54,10 @@ app.use(
   stockAdjustmentRoutes
 );
 app.use("/api/custom-orders",customOrderRoutes);
+app.use(
+  "/api/emi-plans",
+  emiPlanRoutes
+);
 
 
 module.exports = app;

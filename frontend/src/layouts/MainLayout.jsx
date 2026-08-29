@@ -87,6 +87,13 @@ function MainLayout() {
             Custom Orders
           </NavLink>
 
+          <NavLink
+            to="/emi-plans"
+            className={getLinkClass}
+          >
+            EMI Plans
+          </NavLink>
+
 
           
         </nav>
