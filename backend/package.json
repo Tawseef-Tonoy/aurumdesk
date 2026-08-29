@@ -10,7 +10,9 @@
     "test:emi": "node scripts/test_emi_flow.js",
     "seed:emi": "node scripts/seed_emi_data.js",
     "seed:emi:clean": "node scripts/clean_emi_seed.js",
-    "seed:emi:check": "node scripts/check_emi_seed.js"
+    "seed:emi:check": "node scripts/check_emi_seed.js",
+    "test:emi-risk": "node scripts/test_emi_risk.js"
+
   },
 
 

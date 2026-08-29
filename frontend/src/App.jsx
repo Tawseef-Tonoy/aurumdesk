@@ -42,8 +42,8 @@ import CustomOrderDetailsPage from "./features/customOrders/CustomOrderDetailsPa
 import EMIPlansPage from "./features/emi/EMIPlansPage";
 import EMIPlanFormPage from "./features/emi/EMIPlanFormPage";
 import EMIPlanDetailsPage from "./features/emi/EMIPlanDetailsPage";
-
 import EMIInstallmentsPage from "./features/emi/EMIInstallmentsPage";
+import EMIRiskCheckerPage from "./features/emi/EMIRiskCheckerPage";
 
 function App() {
   return (
@@ -68,7 +68,7 @@ function App() {
           path="customers/:id/edit"
           element={<CustomerFormPage />}
         />
-        
+
         <Route
           path="gold-rates"
           element={<GoldRatesPage />}
@@ -89,35 +89,30 @@ function App() {
           element={<ExpensesPage />}
         />
 
-
         <Route
           path="expenses/new"
           element={<ExpenseFormPage />}
         />
 
-
         <Route
           path="expenses/:id/edit"
           element={<ExpenseEditPage />}
         />
-        
+
         <Route
           path="payments"
           element={<PaymentsPage />}
         />
 
-
         <Route
-            path="payments/new"
-            element={<PaymentFormPage />}
+          path="payments/new"
+          element={<PaymentFormPage />}
         />
 
-
         <Route
-            path="payments/:id/edit"
-            element={<PaymentEditPage />}
+          path="payments/:id/edit"
+          element={<PaymentEditPage />}
         />
-
 
         <Route
           path="sales"
@@ -131,13 +126,9 @@ function App() {
 
         <Route
           path="sales/:id"
-          element={<SaleDetailsPage/>}
+          element={<SaleDetailsPage />}
         />
 
-        <Route
-          path="*"
-          element={<NotFoundPage />}
-        />
         <Route
           path="inventory"
           element={<InventoryPage />}
@@ -173,25 +164,26 @@ function App() {
           element={<LowStockAlertsPage />}
         />
 
-        <Route 
-          path="custom-orders" 
-          element={<CustomOrdersPage/>}
+        <Route
+          path="custom-orders"
+          element={<CustomOrdersPage />}
         />
 
-        <Route 
-          path="custom-orders/new" 
-          element={<CustomOrderFormPage/>}
-        />
-        
-        <Route 
-          path="custom-orders/:id" 
-          element={<CustomOrderDetailsPage/>}
+        <Route
+          path="custom-orders/new"
+          element={<CustomOrderFormPage />}
         />
 
-        <Route 
-          path="custom-orders/:id/edit" 
-          element={<CustomOrderFormPage/>}
+        <Route
+          path="custom-orders/:id"
+          element={<CustomOrderDetailsPage />}
         />
+
+        <Route
+          path="custom-orders/:id/edit"
+          element={<CustomOrderFormPage />}
+        />
+
         <Route
           path="emi-plans"
           element={<EMIPlansPage />}
@@ -214,11 +206,18 @@ function App() {
 
         <Route
           path="emi-installments"
-          element={
-            <EMIInstallmentsPage />
-          }
+          element={<EMIInstallmentsPage />}
         />
 
+        <Route
+          path="emi-risk"
+          element={<EMIRiskCheckerPage />}
+        />
+
+        <Route
+          path="*"
+          element={<NotFoundPage />}
+        />
       </Route>
     </Routes>
   );
