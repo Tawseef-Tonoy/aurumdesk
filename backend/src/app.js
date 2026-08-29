@@ -11,6 +11,9 @@ const priceCalculationRoutes = require("./routes/priceCalculation.routes");
 const saleRoutes = require("./routes/sale.routes");
 
 const customOrderRoutes=require("./routes/customOrder.routes");
+const emiPlanRoutes = require(
+  "./routes/emiPlan.routes"
+);
 
 
 const stockAdjustmentRoutes = require(
@@ -19,6 +22,10 @@ const stockAdjustmentRoutes = require(
 
 const lowStockAlertRoutes = require(
   "./routes/lowStockAlert.routes"
+);
+
+const emiInstallmentRoutes = require(
+  "./routes/emiInstallment.routes"
 );
 
 const app = express();
@@ -51,6 +58,15 @@ app.use(
   stockAdjustmentRoutes
 );
 app.use("/api/custom-orders",customOrderRoutes);
+app.use(
+  "/api/emi-plans",
+  emiPlanRoutes
+);
+
+app.use(
+  "/api/emi-installments",
+  emiInstallmentRoutes
+);
 
 
 module.exports = app;

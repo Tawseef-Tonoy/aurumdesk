@@ -3,10 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test:emi": "node scripts/test_emi_flow.js",
+    "seed:emi": "node scripts/seed_emi_data.js",
+    "seed:emi:clean": "node scripts/clean_emi_seed.js",
+    "seed:emi:check": "node scripts/check_emi_seed.js"
   },
+
+
   "keywords": [],
   "author": "",
   "license": "ISC",

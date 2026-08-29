@@ -39,6 +39,12 @@ import CustomOrdersPage from "./features/customOrders/CustomOrdersPage";
 import CustomOrderFormPage from "./features/customOrders/CustomOrderFormPage";
 import CustomOrderDetailsPage from "./features/customOrders/CustomOrderDetailsPage";
 
+import EMIPlansPage from "./features/emi/EMIPlansPage";
+import EMIPlanFormPage from "./features/emi/EMIPlanFormPage";
+import EMIPlanDetailsPage from "./features/emi/EMIPlanDetailsPage";
+
+import EMIInstallmentsPage from "./features/emi/EMIInstallmentsPage";
+
 function App() {
   return (
     <Routes>
@@ -186,7 +192,32 @@ function App() {
           path="custom-orders/:id/edit" 
           element={<CustomOrderFormPage/>}
         />
+        <Route
+          path="emi-plans"
+          element={<EMIPlansPage />}
+        />
 
+        <Route
+          path="emi-plans/new"
+          element={<EMIPlanFormPage />}
+        />
+
+        <Route
+          path="emi-plans/:id/edit"
+          element={<EMIPlanFormPage />}
+        />
+
+        <Route
+          path="emi-plans/:id"
+          element={<EMIPlanDetailsPage />}
+        />
+
+        <Route
+          path="emi-installments"
+          element={
+            <EMIInstallmentsPage />
+          }
+        />
 
       </Route>
     </Routes>
