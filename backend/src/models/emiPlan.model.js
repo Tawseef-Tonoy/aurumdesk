@@ -128,6 +128,7 @@ const emiPlanSchema = new mongoose.Schema(
         "PENDING_APPROVAL",
         "REVISION_REQUIRED",
         "APPROVED",
+        "COMPLETED",
         "REJECTED",
         "CANCELLED",
       ],

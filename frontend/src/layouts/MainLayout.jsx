@@ -94,6 +94,13 @@ function MainLayout() {
             EMI Plans
           </NavLink>
 
+          <NavLink
+            to="/emi-installments"
+            className={getLinkClass}
+          >
+            EMI Installments
+          </NavLink>
+
 
           
         </nav>

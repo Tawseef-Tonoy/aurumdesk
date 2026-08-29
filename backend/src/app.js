@@ -24,6 +24,10 @@ const lowStockAlertRoutes = require(
   "./routes/lowStockAlert.routes"
 );
 
+const emiInstallmentRoutes = require(
+  "./routes/emiInstallment.routes"
+);
+
 const app = express();
 
 app.use(cors());
@@ -57,6 +61,11 @@ app.use("/api/custom-orders",customOrderRoutes);
 app.use(
   "/api/emi-plans",
   emiPlanRoutes
+);
+
+app.use(
+  "/api/emi-installments",
+  emiInstallmentRoutes
 );
 
 

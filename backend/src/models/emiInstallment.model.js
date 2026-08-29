@@ -18,6 +18,7 @@ const emiInstallmentSchema = new mongoose.Schema(
     dueDate: {
       type: Date,
       required: true,
+      index: true,
     },
 
     scheduledAmount: {
@@ -44,17 +45,6 @@ const emiInstallmentSchema = new mongoose.Schema(
       min: 0,
     },
 
-    paymentDate: {
-      type: Date,
-      default: null,
-    },
-
-    paymentMethod: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-
     status: {
       type: String,
       enum: [
@@ -68,6 +58,69 @@ const emiInstallmentSchema = new mongoose.Schema(
       ],
       default: "UPCOMING",
       index: true,
+    },
+
+    overdueDays: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    lastPaymentDate: {
+      type: Date,
+      default: null,
+    },
+
+    lastPaymentMethod: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    lastReceiptReference: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    waivedAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    waivedBy: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    waivedAt: {
+      type: Date,
+      default: null,
+    },
+
+    waiverReason: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    originalDueDate: {
+      type: Date,
+      default: null,
+    },
+
+    rescheduledBy: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    rescheduleReason: {
+      type: String,
+      default: "",
+      trim: true,
     },
   },
   {

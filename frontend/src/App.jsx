@@ -43,6 +43,8 @@ import EMIPlansPage from "./features/emi/EMIPlansPage";
 import EMIPlanFormPage from "./features/emi/EMIPlanFormPage";
 import EMIPlanDetailsPage from "./features/emi/EMIPlanDetailsPage";
 
+import EMIInstallmentsPage from "./features/emi/EMIInstallmentsPage";
+
 function App() {
   return (
     <Routes>
@@ -210,6 +212,12 @@ function App() {
           element={<EMIPlanDetailsPage />}
         />
 
+        <Route
+          path="emi-installments"
+          element={
+            <EMIInstallmentsPage />
+          }
+        />
 
       </Route>
     </Routes>
