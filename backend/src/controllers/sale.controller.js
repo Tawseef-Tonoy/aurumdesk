@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Sale=require("../models/sale.model");
 const JewelryItem=require("../models/jewelryItem.model");
-
+const {roundMoney,createSaleDueEntry}=require("../services/ledger.service");
 
 function generateInvoiceNumber() {
   const date = new Date()
@@ -91,6 +91,89 @@ res.status(500).json({message:error.message});
 };
 
 
+const getOutstandingSalesByCustomer=async(req,res)=>{
+try{
+
+if(
+!mongoose.Types.ObjectId.isValid(
+req.params.customerId
+)
+)
+return res.status(400).json({
+success:false,
+message:"Invalid customer ID"
+});
+
+const sales=await Sale.find({
+customer:req.params.customerId,
+status:{
+$in:[
+"CONFIRMED",
+"PARTIALLY_PAID"
+]
+},
+dueAmount:{$gt:0}
+})
+.select(
+"invoiceNumber totalAmount paidAmount dueAmount status createdAt"
+)
+.sort({createdAt:1});
+
+return res.status(200).json({
+success:true,
+count:sales.length,
+data:sales
+});
+
+}catch(error){
+return res.status(500).json({
+success:false,
+message:error.message
+});
+}
+};
+
+const getAdjustableSalesByCustomer=async(req,res)=>{
+try{
+
+if(
+!mongoose.Types.ObjectId.isValid(
+req.params.customerId
+)
+)
+return res.status(400).json({
+success:false,
+message:"Invalid customer ID"
+});
+
+const sales=await Sale.find({
+customer:req.params.customerId,
+status:{
+$nin:[
+"DRAFT",
+"CANCELLED"
+]
+}
+})
+.select(
+"invoiceNumber totalAmount paidAmount dueAmount status createdAt"
+)
+.sort({createdAt:-1});
+
+return res.status(200).json({
+success:true,
+count:sales.length,
+data:sales
+});
+
+}catch(error){
+return res.status(500).json({
+success:false,
+message:error.message
+});
+}
+};
+
 const updateSale=async(req,res)=>{
 try{
 
@@ -123,6 +206,7 @@ const confirmSale = async (req, res) => {
 
   try {
     let confirmedSale;
+    let ledgerEntry;
 
     await session.withTransaction(async () => {
       const sale = await Sale.findById(
@@ -227,20 +311,65 @@ const confirmSale = async (req, res) => {
         });
       }
 
-      sale.status = "CONFIRMED";
+      const totalAmount=roundMoney(
+        sale.totalAmount
+      );
+
+      const paidAmount=roundMoney(
+        sale.paidAmount||0
+      );
+
+      if(
+        !Number.isFinite(totalAmount)||
+        !Number.isFinite(paidAmount)||
+        paidAmount<0||
+        paidAmount>totalAmount
+      ){
+        const error=new Error(
+          "Invalid sale total or paid amount"
+        );
+
+        error.statusCode=400;
+        throw error;
+      }
+
+      sale.paidAmount=paidAmount;
+      sale.dueAmount=roundMoney(
+        totalAmount-paidAmount
+      );
+
+      sale.status=
+        sale.dueAmount<=0
+          ?"FULLY_PAID"
+          :paidAmount>0
+            ?"PARTIALLY_PAID"
+            :"CONFIRMED";
 
       await sale.save({
         session,
-        validateBeforeSave: true,
+        validateBeforeSave:true
       });
 
-      confirmedSale = sale;
-    });
+      ledgerEntry=await createSaleDueEntry(
+        sale,
+        {
+          createdBy:String(
+            req.body?.confirmedBy||
+            sale.salesPerson||
+            "SYSTEM"
+          ).trim(),
+          session
+        }
+      );
+
+      confirmedSale=sale;
+       });
 
     return res.status(200).json({
       message:
-        "Invoice confirmed and inventory updated",
+        "Invoice confirmed and inventory updated and Ledger recorded",
       sale: confirmedSale,
+      ledgerEntry
     });
   } catch (error) {
     console.error(
@@ -262,42 +391,11 @@ const confirmSale = async (req, res) => {
 
 
 const updatePaymentStatus=async(req,res)=>{
-try{
-
-const sale=await Sale.findById(req.params.id);
-
-if(!sale)
-return res.status(404).json({message:"Invoice not found"});
-
-
-sale.paidAmount=Number(req.body.paidAmount);
-
-sale.dueAmount=
-sale.totalAmount-sale.paidAmount;
-
-
-if(sale.paidAmount<=0)
-sale.status="CONFIRMED";
-
-else if(sale.paidAmount<sale.totalAmount)
-sale.status="PARTIALLY_PAID";
-
-else
-sale.status="FULLY_PAID";
-
-
-await sale.save();
-
-
-res.json({
-message:"Payment updated",
-sale
+return res.status(409).json({
+success:false,
+message:
+"Direct payment updates are disabled. Use the payment collection endpoint."
 });
-
-}catch(error){
-res.status(500).json({message:error.message});
-}
-
 };
 
 
@@ -412,6 +510,8 @@ module.exports={
 createSale,
 getSales,
 getSaleById,
+getOutstandingSalesByCustomer,
+getAdjustableSalesByCustomer,
 updateSale,
 confirmSale,
 updatePaymentStatus,

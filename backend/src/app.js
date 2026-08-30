@@ -9,6 +9,7 @@ const paymentRoutes = require("./routes/payment.routes");
 const priceCalculationRoutes = require("./routes/priceCalculation.routes");
 const saleRoutes = require("./routes/sale.routes");
 const customOrderRoutes = require("./routes/customOrder.routes");
+const ledgerRoutes=require("./routes/ledger.routes");
 
 const emiPlanRoutes = require("./routes/emiPlan.routes");
 const emiInstallmentRoutes = require("./routes/emiInstallment.routes");
@@ -105,6 +106,11 @@ app.use(
 app.use(
   "/api/emi-risk-assessments",
   emiRiskAssessmentRoutes
+);
+
+app.use(
+  "/api/customer-ledgers",
+  ledgerRoutes
 );
 
 module.exports = app;

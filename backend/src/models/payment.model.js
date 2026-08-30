@@ -1,78 +1,99 @@
-const mongoose = require("mongoose");
+const mongoose=require("mongoose");
 
-
-const paymentSchema = new mongoose.Schema(
-{
-    customerId:
-    {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Customer",
-        required: true
-    },
-
-    amount:
-    {
-        type: Number,
-        required: true,
-        min: 1
-    },
-
-    paymentMethod:
-    {
-        type: String,
-        enum:
-        [
-            "CASH",
-            "CARD",
-            "BANK_TRANSFER",
-            "MOBILE_BANKING"
-        ],
-        default: "CASH"
-    },
-
-    paymentDate:
-    {
-        type: Date,
-        default: Date.now
-    },
-
-    referenceNumber:
-    {
-        type:String,
-        trim:true
-    },
-
-    note:
-    {
-        type:String,
-        trim:true
-    },
-
-    collectedBy:
-    {
-        type:String,
-        default:"Admin"
-    },
-
-    status:
-    {
-        type:String,
-        enum:
-        [
-            "COMPLETED",
-            "CANCELLED"
-        ],
-        default:"COMPLETED"
-    }
-
-},
-{
-    timestamps:true
+const paymentSchema=new mongoose.Schema({
+  customerId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Customer",
+    required:true
+  },
+  saleId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Sale",
+    required:true
+  },
+  amount:{
+    type:Number,
+    required:true,
+    min:0.01
+  },
+  paymentMethod:{
+    type:String,
+    enum:[
+      "CASH",
+      "CARD",
+      "BANK_TRANSFER",
+      "MOBILE_BANKING"
+    ],
+    default:"CASH",
+    required:true
+  },
+  paymentDate:{
+    type:Date,
+    default:Date.now,
+    required:true
+  },
+  referenceNumber:{
+    type:String,
+    trim:true,
+    maxlength:100,
+    default:""
+  },
+  note:{
+    type:String,
+    trim:true,
+    maxlength:500,
+    default:""
+  },
+  collectedBy:{
+    type:String,
+    required:true,
+    trim:true,
+    default:"Admin"
+  },
+  status:{
+    type:String,
+    enum:[
+      "DRAFT",
+      "COMPLETED",
+      "CANCELLED"
+    ],
+    default:"DRAFT",
+    required:true
+  },
+  confirmedAt:{
+    type:Date,
+    default:null
+  },
+  cancelledAt:{
+    type:Date,
+    default:null
+  },
+  cancelledBy:{
+    type:String,
+    trim:true,
+    default:""
+  },
+  cancellationReason:{
+    type:String,
+    trim:true,
+    maxlength:500,
+    default:""
+  }
+},{
+  timestamps:true
 });
 
+paymentSchema.index({
+  customerId:1,
+  paymentDate:-1
+});
 
-module.exports =
-mongoose.model(
-    "Payment",
-    paymentSchema
+paymentSchema.index({
+  saleId:1,
+  status:1
+});
+
+module.exports=mongoose.model(
+  "Payment",
+  paymentSchema
 );

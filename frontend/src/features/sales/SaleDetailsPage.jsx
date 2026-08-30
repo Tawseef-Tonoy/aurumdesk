@@ -87,9 +87,11 @@ Cancel
 {(sale.status==="CONFIRMED"||sale.status==="PARTIALLY_PAID")&&
 <button
 className="btn btn-warning"
-onClick={()=>action(`/sales/${id}/payment`,"Payment Updated")}
+onClick={()=>navigate(
+`/payments/new?customerId=${sale.customer?._id||sale.customer}&saleId=${sale._id}`
+)}
 >
-Update Payment
+Collect Payment
 </button>
 }
 
