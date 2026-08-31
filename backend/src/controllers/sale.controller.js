@@ -400,79 +400,20 @@ message:
 
 
 const returnSale=async(req,res)=>{
-try{
-
-const sale=await Sale.findById(req.params.id);
-
-if(!sale)
-return res.status(404).json({message:"Invoice not found"});
-
-
-if(
-sale.status!=="CONFIRMED" &&
-sale.status!=="FULLY_PAID"
-)
-return res.status(400).json({message:"Invoice cannot be returned"});
-
-
-sale.status="RETURNED";
-
-
-for(const item of sale.items){
-
-await JewelryItem.findByIdAndUpdate(
-item.jewelryItem,
-{status:"AVAILABLE"}
-);
-
-}
-
-
-await sale.save();
-
-
-res.json({
-message:"Invoice returned",
-sale
+return res.status(409).json({
+success:false,
+message:
+"Direct invoice returns are disabled. Use the Sale Return or Exchange workflow."
 });
-
-}catch(error){
-res.status(500).json({message:error.message});
-}
-
 };
 
 
 const exchangeSale=async(req,res)=>{
-try{
-
-const sale=await Sale.findById(req.params.id);
-
-if(!sale)
-return res.status(404).json({message:"Invoice not found"});
-
-
-if(
-sale.status!=="CONFIRMED" &&
-sale.status!=="FULLY_PAID"
-)
-return res.status(400).json({message:"Invoice cannot be exchanged"});
-
-
-sale.status="EXCHANGED";
-
-await sale.save();
-
-
-res.json({
-message:"Invoice exchanged",
-sale
+return res.status(409).json({
+success:false,
+message:
+"Direct invoice exchanges are disabled. Use the Sale Return or Exchange workflow."
 });
-
-}catch(error){
-res.status(500).json({message:error.message});
-}
-
 };
 
 

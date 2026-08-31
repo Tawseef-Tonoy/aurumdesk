@@ -75,6 +75,13 @@ function MainLayout() {
           </NavLink>
 
           <NavLink
+            to="/return-exchanges"
+            className={getLinkClass}
+          >
+            Returns & Exchanges
+          </NavLink>
+
+          <NavLink
             to="/stock-adjustments"
             className={getLinkClass}
           >

@@ -48,6 +48,10 @@ import EMIRiskCheckerPage from "./features/emi/EMIRiskCheckerPage";
 import CustomerDueLedgerPage from "./features/ledger/CustomerDueLedgerPage";
 import LedgerAdjustmentFormPage from "./features/ledger/LedgerAdjustmentFormPage";
 
+import ReturnExchangesPage from "./features/returnExchanges/ReturnExchangesPage";
+import ReturnExchangeFormPage from "./features/returnExchanges/ReturnExchangeFormPage";
+import ReturnExchangeDetailsPage from "./features/returnExchanges/ReturnExchangeDetailsPage";
+
 function App() {
   return (
     <Routes>
@@ -140,6 +144,26 @@ function App() {
         <Route
           path="sales/:id"
           element={<SaleDetailsPage />}
+        />
+
+        <Route
+          path="return-exchanges"
+          element={<ReturnExchangesPage />}
+        />
+
+        <Route
+          path="return-exchanges/new"
+          element={<ReturnExchangeFormPage />}
+        />
+
+        <Route
+          path="return-exchanges/:id/edit"
+          element={<ReturnExchangeFormPage />}
+        />
+
+        <Route
+          path="return-exchanges/:id"
+          element={<ReturnExchangeDetailsPage />}
         />
 
         <Route

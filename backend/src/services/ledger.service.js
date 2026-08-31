@@ -6,6 +6,7 @@ const Payment=require("../models/payment.model");
 const EMIPlan=require("../models/emiPlan.model");
 const EMIInstallment=require("../models/emiInstallment.model");
 const EMIInstallmentPayment=require("../models/emiInstallmentPayment.model");
+const ReturnExchange=require("../models/returnExchange.model");
 const LedgerEntry=require("../models/ledgerEntry.model");
 
 const sourceModels={
@@ -14,6 +15,7 @@ const sourceModels={
   EMI_PLAN:EMIPlan,
   EMI_INSTALLMENT:EMIInstallment,
   EMI_INSTALLMENT_PAYMENT:EMIInstallmentPayment,
+  RETURN_EXCHANGE:ReturnExchange,
   LEDGER_ENTRY:LedgerEntry
 };
 
@@ -264,6 +266,27 @@ async function validateSource({
 
       break;
     }
+
+    case "RETURN_EXCHANGE":
+      if(
+        !sameId(
+          document.customer,
+          customer._id
+        )||
+        !sameId(
+          document.sale,
+          sale._id
+        )
+      ){
+        throw serviceError(
+          "Return or exchange source does not match the customer and sale"
+        );
+      }
+
+      documentNumber=
+        document.returnExchangeNo;
+
+      break;
 
     case "LEDGER_ENTRY":
       if(
