@@ -164,5 +164,11 @@ default:"DRAFT"
 timestamps:true
 });
 
+saleSchema.index({
+customer:1,
+status:1,
+dueAmount:1,
+createdAt:1
+});
 
 module.exports=mongoose.model("Sale",saleSchema);

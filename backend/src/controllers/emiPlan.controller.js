@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 
+const {
+  createEMIServiceChargeEntry
+}=require(
+  "../services/ledger.service"
+);
+
 const EMIPlan = require(
   "../models/emiPlan.model"
 );
@@ -860,125 +866,238 @@ async function submitEMIPlan(req, res) {
   }
 }
 
-async function approveEMIPlan(req, res) {
-  try {
-    const plan =
-      await EMIPlan.findById(
-        req.params.id
-      );
+async function approveEMIPlan(
+  req,
+  res
+){
+  const session=
+    await mongoose.startSession();
 
-    if (!plan) {
-      return res.status(404).json({
-        success: false,
-        message:
-          "EMI plan not found",
-      });
-    }
+  try{
+    let approvedPlan;
+    let installments=[];
+    let ledgerEntry=null;
 
-    if (
-      plan.status !==
-      "PENDING_APPROVAL"
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Only plans pending approval can be approved",
-      });
-    }
+    await session.withTransaction(
+      async()=>{
+        const plan=
+          await EMIPlan.findById(
+            req.params.id
+          ).session(session);
 
-    const existingCount =
-      await EMIInstallment.countDocuments({
-        emiPlan: plan._id,
-      });
+        if(!plan){
+          throw Object.assign(
+            new Error(
+              "EMI plan not found"
+            ),
+            {
+              statusCode:404
+            }
+          );
+        }
 
-    if (existingCount > 0) {
-      return res.status(409).json({
-        success: false,
-        message:
-          "Installments already exist for this EMI plan",
-      });
-    }
+        if(
+          plan.status!==
+          "PENDING_APPROVAL"
+        ){
+          throw Object.assign(
+            new Error(
+              "Only plans pending approval can be approved"
+            ),
+            {
+              statusCode:400
+            }
+          );
+        }
 
-    const schedule =
-      generateInstallmentSchedule({
-        emiPayable:
-          plan.emiPayable,
+        const existingCount=
+          await EMIInstallment
+            .countDocuments({
+              emiPlan:
+                plan._id
+            })
+            .session(session);
 
-        installmentCount:
-          plan.installmentCount,
+        if(existingCount>0){
+          throw Object.assign(
+            new Error(
+              "Installments already exist for this EMI plan"
+            ),
+            {
+              statusCode:409
+            }
+          );
+        }
 
-        firstDueDate:
-          plan.firstDueDate,
+        const sale=
+          await Sale.findById(
+            plan.sale
+          ).session(session);
 
-        frequency:
-          plan.frequency,
+        if(!sale){
+          throw Object.assign(
+            new Error(
+              "Related sale not found"
+            ),
+            {
+              statusCode:404
+            }
+          );
+        }
 
-        gracePeriodDays:
-          plan.gracePeriodDays,
-      });
+        if(
+          ![
+            "CONFIRMED",
+            "PARTIALLY_PAID"
+          ].includes(
+            sale.status
+          )
+        ){
+          throw Object.assign(
+            new Error(
+              "EMI can only be approved for an unpaid confirmed sale"
+            ),
+            {
+              statusCode:400
+            }
+          );
+        }
 
-    const documents =
-      schedule.map(
-        (installment) => ({
-          emiPlan: plan._id,
-          ...installment,
-        })
-      );
+        const currentDue=
+          Number(
+            sale.dueAmount||0
+          );
 
-    await EMIInstallment.insertMany(
-      documents
+        if(
+          !Number.isFinite(
+            currentDue
+          )||
+          currentDue<=0
+        ){
+          throw Object.assign(
+            new Error(
+              "Related sale has no outstanding balance"
+            ),
+            {
+              statusCode:400
+            }
+          );
+        }
+
+        const schedule=
+          generateInstallmentSchedule({
+            emiPayable:
+              plan.emiPayable,
+
+            installmentCount:
+              plan.installmentCount,
+
+            firstDueDate:
+              plan.firstDueDate,
+
+            frequency:
+              plan.frequency,
+
+            gracePeriodDays:
+              plan.gracePeriodDays
+          });
+
+        const documents=
+          schedule.map(
+            installment=>({
+              emiPlan:
+                plan._id,
+
+              ...installment
+            })
+          );
+
+        installments=
+          await EMIInstallment.insertMany(
+            documents,
+            {
+              session
+            }
+          );
+
+        plan.status=
+          "APPROVED";
+
+        plan.approvedBy=
+          String(
+            req.body?.approvedBy||
+            "Owner/Admin"
+          ).trim();
+
+        plan.approvedAt=
+          new Date();
+
+        plan.remainingBalance=
+          plan.emiPayable;
+
+        await plan.save({
+          session,
+          validateBeforeSave:true
+        });
+
+        /*
+          IMPORTANT ACCOUNTING RULE
+
+          The financed principal already
+          exists in Customer Due Ledger as
+          NEW_SALE_DUE.
+
+          Therefore only the EMI service
+          charge creates a new EMI_DUE debit.
+        */
+        ledgerEntry=
+          await createEMIServiceChargeEntry(
+            plan,
+            {
+              createdBy:
+                plan.approvedBy||
+                "SYSTEM",
+
+              session
+            }
+          );
+
+        approvedPlan=plan;
+      }
     );
 
-    try {
-      plan.status = "APPROVED";
-
-      plan.approvedBy =
-        String(
-          req.body.approvedBy ||
-            "Owner/Admin"
-        ).trim();
-
-      plan.approvedAt =
-        new Date();
-
-      plan.remainingBalance =
-        plan.emiPayable;
-
-      await plan.save();
-    } catch (saveError) {
-      await EMIInstallment.deleteMany({
-        emiPlan: plan._id,
-      });
-
-      throw saveError;
-    }
-
-    const installments =
-      await EMIInstallment.find({
-        emiPlan: plan._id,
-      }).sort({
-        installmentNo: 1,
-      });
-
     return res.status(200).json({
-      success: true,
+      success:true,
       message:
         "EMI plan approved and installment schedule created",
-      data: plan,
+
+      data:
+        approvedPlan,
+
       installments,
+
+      ledgerEntry
     });
-  } catch (error) {
+  }catch(error){
     console.error(
       "Approve EMI error:",
       error
     );
 
-    return res.status(500).json({
-      success: false,
-      message:
-        error.message ||
-        "Failed to approve EMI plan",
-    });
+    const statusCode=
+      error.statusCode||
+      500;
+
+    return res
+      .status(statusCode)
+      .json({
+        success:false,
+        message:
+          error.message||
+          "Failed to approve EMI plan"
+      });
+  }finally{
+    await session.endSession();
   }
 }
 

@@ -61,6 +61,13 @@ function MainLayout() {
           </NavLink>
 
           <NavLink
+            to="/customer-ledgers"
+            className={getLinkClass}
+          >
+            Customer Due Ledger
+          </NavLink>
+
+          <NavLink
             to="/sales"
             className={getLinkClass}
           >

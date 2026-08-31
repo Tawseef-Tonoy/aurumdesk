@@ -1,31 +1,70 @@
 import apiClient from "../../api/apiClient";
 
-// GET ALL PAYMENTS
-export const getPayments = async()=>{
-    const response = await apiClient.get("/payments");
-    return response.data;
-};
+export async function getPayments(){
+  const response=await apiClient.get(
+    "/payments"
+  );
 
-// CREATE PAYMENT
-export const createPayment = async(data)=>{
-    const response = await apiClient.post( "/payments", data);
-    return response.data;
-};
+  return response.data;
+}
 
-// UPDATE PAYMENT
-export const updatePayment = async(id,data)=>{
-    const response = await apiClient.patch(`/payments/${id}`,data);
-    return response.data;
-};
+export async function getPaymentById(id){
+  const response=await apiClient.get(
+    `/payments/${id}`
+  );
 
-// CANCEL PAYMENT
-export const cancelPayment = async(id)=>{
-    const response = await apiClient.patch(`/payments/${id}/cancel`);
-    return response.data;
-};
+  return response.data;
+}
 
-// GET CUSTOMERS FOR DROPDOWN
-export const getCustomers = async()=>{
-    const response =await apiClient.get("/customers");
-    return response.data;
-};
+export async function createPayment(data){
+  const response=await apiClient.post(
+    "/payments",
+    data
+  );
+
+  return response.data;
+}
+
+export async function updatePayment(id,data){
+  const response=await apiClient.patch(
+    `/payments/${id}`,
+    data
+  );
+
+  return response.data;
+}
+
+export async function confirmPayment(id){
+  const response=await apiClient.patch(
+    `/payments/${id}/confirm`
+  );
+
+  return response.data;
+}
+
+export async function cancelPayment(id,data){
+  const response=await apiClient.patch(
+    `/payments/${id}/cancel`,
+    data
+  );
+
+  return response.data;
+}
+
+export async function getCustomers(){
+  const response=await apiClient.get(
+    "/customers"
+  );
+
+  return response.data;
+}
+
+export async function getOutstandingSales(
+  customerId
+){
+  const response=await apiClient.get(
+    `/sales/customer/${customerId}/outstanding`
+  );
+
+  return response.data;
+}

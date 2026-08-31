@@ -45,6 +45,9 @@ import EMIPlanDetailsPage from "./features/emi/EMIPlanDetailsPage";
 import EMIInstallmentsPage from "./features/emi/EMIInstallmentsPage";
 import EMIRiskCheckerPage from "./features/emi/EMIRiskCheckerPage";
 
+import CustomerDueLedgerPage from "./features/ledger/CustomerDueLedgerPage";
+import LedgerAdjustmentFormPage from "./features/ledger/LedgerAdjustmentFormPage";
+
 function App() {
   return (
     <Routes>
@@ -112,6 +115,16 @@ function App() {
         <Route
           path="payments/:id/edit"
           element={<PaymentEditPage />}
+        />
+
+        <Route
+            path="customer-ledgers"
+            element={<CustomerDueLedgerPage />}
+        />
+
+        <Route
+          path="customer-ledgers/adjustments/new"
+          element={<LedgerAdjustmentFormPage />}
         />
 
         <Route
