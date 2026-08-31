@@ -20,6 +20,7 @@ const sourceTypes=[
   "EMI_PLAN",
   "EMI_INSTALLMENT",
   "EMI_INSTALLMENT_PAYMENT",
+  "RETURN_EXCHANGE",
   "LEDGER_ENTRY"
 ];
 

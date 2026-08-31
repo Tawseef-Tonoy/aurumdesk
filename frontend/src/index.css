@@ -164,4 +164,134 @@ a {
   .ledger-print tr {
     break-inside: avoid;
   }
+
+  .return-item-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fafafa;
+}
+
+.return-item-card:last-child {
+  margin-bottom: 0;
+}
+
+.return-exchange-print table th,
+.sale-invoice-print table th {
+  white-space: nowrap;
+}
+
+.invoice-print-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #111827;
+}
+
+.invoice-business-name {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.invoice-print-meta {
+  text-align: right;
+}
+
+.invoice-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.invoice-total-row {
+  font-size: 1.1rem;
+}
+
+.invoice-print-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d1d5db;
+}
+
+.invoice-signature {
+  min-width: 180px;
+  padding-top: 2rem;
+  text-align: center;
+  border-top: 1px solid #111827;
+}
+
+@media screen {
+  .invoice-print-header {
+    display: none;
+  }
+
+  .invoice-print-footer {
+    display: none;
+  }
+}
+
+@media print {
+  .return-exchange-print::before {
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 20pt;
+    font-weight: 700;
+    content: "Sale Return / Exchange Receipt";
+  }
+
+  .return-exchange-print .card,
+  .sale-invoice-print .card {
+    break-inside: avoid;
+    border: 1px solid #d1d5db;
+    box-shadow: none;
+  }
+
+  .return-exchange-print .table-responsive,
+  .sale-invoice-print .table-responsive {
+    overflow: visible;
+  }
+
+  .return-exchange-print table,
+  .sale-invoice-print table {
+    width: 100%;
+    font-size: 8.5pt;
+  }
+
+  .return-exchange-print th,
+  .return-exchange-print td,
+  .sale-invoice-print th,
+  .sale-invoice-print td {
+    padding: 5px;
+  }
+
+  .return-exchange-print tr,
+  .sale-invoice-print tr {
+    break-inside: avoid;
+  }
+
+  .sale-invoice-print .invoice-print-header {
+    display: flex;
+  }
+
+  .sale-invoice-print .invoice-print-footer {
+    display: flex;
+  }
+
+  .sale-invoice-print .row {
+    break-inside: avoid;
+  }
+
+  .sale-invoice-print .invoice-summary-card {
+    margin-left: auto;
+  }
+}
 }

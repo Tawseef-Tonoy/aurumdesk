@@ -10,6 +10,7 @@ const priceCalculationRoutes = require("./routes/priceCalculation.routes");
 const saleRoutes = require("./routes/sale.routes");
 const customOrderRoutes = require("./routes/customOrder.routes");
 const ledgerRoutes=require("./routes/ledger.routes");
+const returnExchangeRoutes=require("./routes/returnExchange.routes");
 
 const emiPlanRoutes = require("./routes/emiPlan.routes");
 const emiInstallmentRoutes = require("./routes/emiInstallment.routes");
@@ -75,6 +76,11 @@ app.use(
 app.use(
   "/api/sales",
   saleRoutes
+);
+
+app.use(
+  "/api/return-exchanges",
+  returnExchangeRoutes
 );
 
 app.use(
