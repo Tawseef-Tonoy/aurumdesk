@@ -47,6 +47,20 @@ function MainLayout() {
           </NavLink>
 
           <NavLink
+            to="/purchases"
+            className={getLinkClass}
+            >
+            Purchases
+            </NavLink>
+
+          <NavLink
+            to="/suppliers"
+            className={getLinkClass}
+            >
+            Suppliers
+            </NavLink>
+
+          <NavLink
             to="/expenses"
             className={getLinkClass}
           >

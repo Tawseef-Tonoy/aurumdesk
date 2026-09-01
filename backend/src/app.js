@@ -11,6 +11,8 @@ const saleRoutes = require("./routes/sale.routes");
 const customOrderRoutes = require("./routes/customOrder.routes");
 const ledgerRoutes=require("./routes/ledger.routes");
 const returnExchangeRoutes=require("./routes/returnExchange.routes");
+const supplierRoutes=require("./routes/supplier.routes");
+const purchaseRoutes=require("./routes/purchase.routes");
 
 const emiPlanRoutes = require("./routes/emiPlan.routes");
 const emiInstallmentRoutes = require("./routes/emiInstallment.routes");
@@ -91,6 +93,16 @@ app.use(
 app.use(
   "/api/custom-orders",
   customOrderRoutes
+);
+
+app.use(
+"/api/suppliers",
+supplierRoutes
+);
+
+app.use(
+"/api/purchases",
+purchaseRoutes
 );
 
 app.use(
