@@ -117,6 +117,13 @@ function MainLayout() {
           </NavLink>
 
           <NavLink
+            to="/workers"
+            className={getLinkClass}
+            >
+            Workers
+            </NavLink>
+
+          <NavLink
             to="/emi-plans"
             className={getLinkClass}
           >

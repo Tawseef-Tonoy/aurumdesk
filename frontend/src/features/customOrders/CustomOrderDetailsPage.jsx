@@ -8,6 +8,13 @@ getCustomOrderReceipt,
 getCustomOrderProgress,
 updateCustomOrderStatus
 } from "./customOrderService";
+import{getWorkers}from"../workers/workerService";
+
+import{
+getAssignmentByOrder,
+createAssignment,
+updateAssignment
+}from"../workers/workerAssignmentService";
 
 function CustomOrderDetailsPage(){
 const{id}=useParams();
@@ -18,6 +25,13 @@ const[progress,setProgress]=useState([]);
 const[newStatus,setNewStatus]=useState("");
 const[statusNote,setStatusNote]=useState("");
 const[updatingStatus,setUpdatingStatus]=useState(false);
+const[workers,setWorkers]=useState([]);
+const[assignments,setAssignments]=useState([]);
+const[selectedWorker,setSelectedWorker]=useState("");
+const[deadline,setDeadline]=useState("");
+const[instructions,setInstructions]=useState("");
+const[workerCharge,setWorkerCharge]=useState("");
+const[assigning,setAssigning]=useState(false);
 
 async function loadOrder(){
 
@@ -27,6 +41,10 @@ const response=await getCustomOrderById(id);
 setOrder(response.data);
 const progressResponse=await getCustomOrderProgress(id);
 setProgress(progressResponse.data||[]);
+const workerResponse=await getWorkers();
+setWorkers(workerResponse.data||[]);
+const assignmentResponse=await getAssignmentByOrder(id);
+setAssignments(assignmentResponse.data||[]);
 }catch(err){
 setError(err.message);
 }finally{
@@ -199,6 +217,92 @@ setUpdatingStatus(false);
 
 }
 
+async function handleAssignWorker(){
+
+if(!selectedWorker||!deadline){
+return;
+}
+
+try{
+
+setAssigning(true);
+setError("");
+
+await createAssignment({
+customOrder:id,
+worker:selectedWorker,
+deadline,
+instructions,
+workerCharge:Number(workerCharge||0)
+});
+
+
+setSelectedWorker("");
+setDeadline("");
+setInstructions("");
+setWorkerCharge("");
+
+
+const response=
+await getAssignmentByOrder(id);
+
+
+setAssignments(
+response.data||[]
+);
+
+
+}catch(err){
+
+setError(
+err.message
+);
+
+}finally{
+
+setAssigning(false);
+
+}
+
+}
+
+async function handleAssignmentStatus(id,status){
+
+try{
+
+setError("");
+
+const response=
+await updateAssignment(
+id,
+{
+status
+}
+);
+
+
+setAssignments(current=>
+current.map(item=>
+item._id===id?
+{
+...item,
+status:response.data.status
+}
+:
+item
+)
+);
+
+
+}catch(err){
+
+setError(
+err.message
+);
+
+}
+
+}
 
 if(loading)return <LoadingState message="Loading custom order..."/>;
 
@@ -453,6 +557,257 @@ updatingStatus
 
 }
 
+
+</div>
+
+</div>
+
+</div>
+
+<div className="col-12">
+
+<div className="card page-card">
+
+<div className="card-body">
+
+<h2 className="h5 border-bottom pb-2">
+Worker Assignment
+</h2>
+
+
+{
+assignments.length>0?
+(
+assignments.map(item=>(
+
+<div
+key={item._id}
+className="border rounded p-3 mb-3"
+>
+
+<div>
+<strong>Worker:</strong>{" "}
+{item.worker?.name||"—"}
+</div>
+
+<div>
+<strong>Specialization:</strong>{" "}
+{item.worker?.specialization||"—"}
+</div>
+
+<div>
+<strong>Status:</strong>{" "}
+<span className="badge text-bg-info">
+{item.status}
+</span>
+</div>
+
+
+<div className="mt-2">
+
+<select
+className="form-select form-select-sm"
+value={item.status}
+disabled={
+item.status==="COMPLETED"||
+item.status==="CANCELLED"
+}
+onChange={
+e=>handleAssignmentStatus(
+item._id,
+e.target.value
+)
+}
+>
+
+<option value="ASSIGNED">
+ASSIGNED
+</option>
+
+<option value="IN_PROGRESS">
+IN_PROGRESS
+</option>
+
+<option value="COMPLETED">
+COMPLETED
+</option>
+
+<option value="CANCELLED">
+CANCELLED
+</option>
+
+</select>
+
+</div>
+
+<div>
+<strong>Deadline:</strong>{" "}
+{formatDate(item.deadline)}
+</div>
+
+<div>
+<strong>Charge:</strong>{" "}
+{formatMoney(item.workerCharge)}
+</div>
+
+<div>
+<strong>Instructions:</strong>{" "}
+{item.instructions||"—"}
+</div>
+
+</div>
+
+))
+
+)
+:
+(
+<p className="text-muted">
+No worker assigned yet.
+</p>
+)
+
+}
+
+
+{
+![
+"DELIVERED",
+"CANCELLED"
+].includes(order.status)&&(
+
+<>
+
+<hr/>
+
+<h3 className="h6">
+Assign Worker
+</h3>
+
+
+<div className="row g-3">
+
+
+<div className="col-md-4">
+
+<label className="form-label">
+Worker
+</label>
+
+<select
+className="form-select"
+value={selectedWorker}
+onChange={
+e=>setSelectedWorker(e.target.value)
+}
+>
+
+<option value="">
+Select worker
+</option>
+
+
+{
+workers.map(worker=>(
+
+<option
+key={worker._id}
+value={worker._id}
+>
+
+{worker.name} - {worker.specialization}
+
+</option>
+
+))
+
+}
+
+</select>
+
+</div>
+
+
+<div className="col-md-3">
+
+<label className="form-label">
+Deadline
+</label>
+
+<input
+type="date"
+className="form-control"
+value={deadline}
+onChange={
+e=>setDeadline(e.target.value)
+}
+/>
+
+</div>
+
+
+<div className="col-md-2">
+
+<label className="form-label">
+Charge
+</label>
+
+<input
+type="number"
+className="form-control"
+value={workerCharge}
+onChange={
+e=>setWorkerCharge(e.target.value)
+}
+/>
+
+</div>
+
+
+<div className="col-md-3">
+
+<label className="form-label">
+Instructions
+</label>
+
+<input
+className="form-control"
+value={instructions}
+onChange={
+e=>setInstructions(e.target.value)
+}
+/>
+
+</div>
+
+
+<div className="col-12">
+
+<button
+className="btn btn-dark"
+disabled={assigning}
+onClick={handleAssignWorker}
+>
+
+{
+assigning?
+"Assigning..."
+:
+"Assign Worker"
+}
+
+</button>
+
+</div>
+
+
+</div>
+
+</>
+
+)
+
+}
 
 </div>
 

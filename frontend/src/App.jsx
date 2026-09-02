@@ -58,6 +58,9 @@ import SuppliersPage from "./features/suppliers/SuppliersPage";
 import SupplierFormPage from "./features/suppliers/SupplierFormPage";
 import PurchaseDetailsPage from "./features/purchases/PurchaseDetailsPage";
 
+import WorkersPage from "./features/workers/WorkersPage";
+import WorkerFormPage from "./features/workers/WorkerFormPage";
+
 function App() {
   return (
     <Routes>
@@ -281,6 +284,9 @@ function App() {
           path="purchases/:id"
           element={<PurchaseDetailsPage />}
           />
+
+        <Route path="/workers" element={<WorkersPage/>}/>
+        <Route path="/workers/new" element={<WorkerFormPage/>}/>
 
         <Route
           path="*"
