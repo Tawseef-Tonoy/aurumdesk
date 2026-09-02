@@ -1,5 +1,7 @@
 const CustomOrder=require("../models/customOrder.model");
 const Customer=require("../models/customer.model");
+const {updateStatus,getProgress}=require("../services/customOrderProgress.service");
+const CustomOrderProgress=require("../models/customOrderProgress.model");
 
 async function generateOrderNo(){
 let orderNo;
@@ -135,6 +137,22 @@ expectedDeliveryDate:deliveryDate,
 notes,
 bookedBy,
 status:"BOOKED"
+});
+
+await CustomOrderProgress.create({
+
+customOrder:
+customOrder._id,
+
+status:
+"BOOKED",
+
+note:
+"Custom order booked",
+
+changedBy:
+bookedBy
+
 });
 
 await customOrder.populate("customer","customerId name phone status");
@@ -393,10 +411,118 @@ error:error.message
 }
 }
 
+async function updateCustomOrderStatus(req,res){
+
+try{
+
+const{
+status,
+changedBy,
+note
+}=req.body;
+
+
+if(!status||!changedBy){
+
+return res.status(400).json({
+
+success:false,
+
+message:"Status and changed by are required"
+
+});
+
+}
+
+
+const progress=
+await updateStatus(
+req.params.id,
+status,
+changedBy,
+note
+);
+
+
+return res.status(200).json({
+
+success:true,
+
+message:"Custom order status updated successfully",
+
+data:progress
+
+});
+
+
+}catch(error){
+
+console.error(
+"Update custom order status error:",
+error
+);
+
+
+return res.status(400).json({
+
+success:false,
+
+message:error.message
+
+});
+
+}
+
+}
+
+
+
+async function getCustomOrderProgress(req,res){
+
+try{
+
+
+const progress=
+await getProgress(
+req.params.id
+);
+
+
+return res.status(200).json({
+
+success:true,
+
+data:progress
+
+});
+
+
+}catch(error){
+
+console.error(
+"Get custom order progress error:",
+error
+);
+
+
+return res.status(400).json({
+
+success:false,
+
+message:error.message
+
+});
+
+}
+
+}
+
 module.exports={
 createCustomOrder,
 getCustomOrders,
 getCustomOrderById,
 updateCustomOrder,
-getCustomOrderReceipt
+getCustomOrderReceipt,
+updateCustomOrderStatus,
+getCustomOrderProgress
 };

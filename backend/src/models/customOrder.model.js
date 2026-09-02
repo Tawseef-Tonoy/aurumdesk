@@ -142,7 +142,15 @@ default:[]
 
 status:{
 type:String,
-enum:["BOOKED"],
+enum:[
+"BOOKED",
+"DESIGN_APPROVED",
+"IN_PRODUCTION",
+"QUALITY_CHECK",
+"READY",
+"DELIVERED",
+"CANCELLED"
+],
 default:"BOOKED"
 }
 },{

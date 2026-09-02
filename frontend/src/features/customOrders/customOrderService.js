@@ -24,3 +24,30 @@ export async function getCustomOrderReceipt(id){
 const response=await apiClient.get(`/custom-orders/${id}/receipt`);
 return response.data;
 }
+
+export async function getCustomOrderProgress(id){
+
+const response=
+await apiClient.get(
+`/custom-orders/${id}/progress`
+);
+
+return response.data;
+
+}
+
+
+export async function updateCustomOrderStatus(
+id,
+data
+){
+
+const response=
+await apiClient.patch(
+`/custom-orders/${id}/status`,
+data
+);
+
+return response.data;
+
+}
