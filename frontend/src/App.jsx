@@ -52,6 +52,12 @@ import ReturnExchangesPage from "./features/returnExchanges/ReturnExchangesPage"
 import ReturnExchangeFormPage from "./features/returnExchanges/ReturnExchangeFormPage";
 import ReturnExchangeDetailsPage from "./features/returnExchanges/ReturnExchangeDetailsPage";
 
+import PurchasesPage from "./features/purchases/PurchasesPage";
+import PurchaseFormPage from "./features/purchases/PurchaseFormPage";
+import SuppliersPage from "./features/suppliers/SuppliersPage";
+import SupplierFormPage from "./features/suppliers/SupplierFormPage";
+import PurchaseDetailsPage from "./features/purchases/PurchaseDetailsPage";
+
 function App() {
   return (
     <Routes>
@@ -250,6 +256,31 @@ function App() {
           path="emi-risk"
           element={<EMIRiskCheckerPage />}
         />
+
+        <Route
+          path="purchases"
+          element={<PurchasesPage />}
+          />
+
+        <Route
+          path="purchases/new"
+          element={<PurchaseFormPage />}
+          />
+
+          <Route
+            path="suppliers"
+            element={<SuppliersPage />}
+            />
+
+          <Route
+            path="suppliers/new"
+            element={<SupplierFormPage />}
+            />
+
+        <Route
+          path="purchases/:id"
+          element={<PurchaseDetailsPage />}
+          />
 
         <Route
           path="*"
