@@ -16,6 +16,7 @@ const purchaseRoutes=require("./routes/purchase.routes");
 const workerRoutes=require("./routes/worker.routes");
 const workerAssignmentRoutes=require("./routes/workerAssignment.routes");
 const cashClosingRoutes=require("./routes/cashClosing.routes");
+const monthlyReportRoutes=require("./routes/monthlyReport.routes");
 
 const emiPlanRoutes = require("./routes/emiPlan.routes");
 const emiInstallmentRoutes = require("./routes/emiInstallment.routes");
@@ -136,6 +137,11 @@ app.use(
 app.use(
   "/api/customer-ledgers",
   ledgerRoutes
+);
+
+app.use(
+"/api/monthly-reports",
+monthlyReportRoutes
 );
 
 module.exports = app;
