@@ -2,26 +2,38 @@ import{useEffect,useState}from"react";
 import{Link,useParams}from"react-router-dom";
 import ErrorAlert from"../../components/ErrorAlert";
 import LoadingState from"../../components/LoadingState";
-import{getCustomOrderById,getCustomOrderReceipt}from"./customOrderService";
+import {
+getCustomOrderById,
+getCustomOrderReceipt,
+getCustomOrderProgress,
+updateCustomOrderStatus
+} from "./customOrderService";
 
 function CustomOrderDetailsPage(){
 const{id}=useParams();
 const[order,setOrder]=useState(null);
 const[loading,setLoading]=useState(true);
 const[error,setError]=useState("");
+const[progress,setProgress]=useState([]);
+const[newStatus,setNewStatus]=useState("");
+const[statusNote,setStatusNote]=useState("");
+const[updatingStatus,setUpdatingStatus]=useState(false);
 
-useEffect(()=>{
 async function loadOrder(){
+
 try{
 setError("");
 const response=await getCustomOrderById(id);
 setOrder(response.data);
+const progressResponse=await getCustomOrderProgress(id);
+setProgress(progressResponse.data||[]);
 }catch(err){
 setError(err.message);
 }finally{
 setLoading(false);
 }
 }
+useEffect(()=>{
 loadOrder();
 },[id]);
 
@@ -39,6 +51,38 @@ return `৳${Number(value||0).toLocaleString()}`;
 
 function showValue(value){
 return value===undefined||value===null||value===""?"—":String(value);
+}
+
+function getStatusClass(status){
+
+const classes={
+
+BOOKED:
+"text-bg-primary",
+
+DESIGN_APPROVED:
+"text-bg-info",
+
+IN_PRODUCTION:
+"text-bg-warning",
+
+QUALITY_CHECK:
+"text-bg-secondary",
+
+READY:
+"text-bg-success",
+
+DELIVERED:
+"text-bg-success",
+
+CANCELLED:
+"text-bg-danger"
+
+};
+
+
+return classes[status]||"text-bg-dark";
+
 }
 
 async function handlePrintReceipt(){
@@ -116,6 +160,46 @@ setError(err.message);
 }
 }
 
+async function handleStatusUpdate(){
+
+if(!newStatus){
+return;
+}
+
+try{
+
+setUpdatingStatus(true);
+setError("");
+
+await updateCustomOrderStatus(
+id,
+{
+status:newStatus,
+changedBy:"Admin",
+note:statusNote
+}
+);
+
+setNewStatus("");
+setStatusNote("");
+
+await loadOrder();
+
+}catch(error){
+
+setError(
+error.message
+);
+
+}finally{
+
+setUpdatingStatus(false);
+
+}
+
+}
+
+
 if(loading)return <LoadingState message="Loading custom order..."/>;
 
 if(!order)return(
@@ -173,6 +257,207 @@ return(
 </dl>
 </div>
 </div>
+</div>
+
+<div className="col-12">
+
+<div className="card page-card">
+
+<div className="card-body">
+
+<h2 className="h5 border-bottom pb-2">
+Order Progress
+</h2>
+
+
+<div className="mb-4">
+
+<span
+className={
+`badge ${getStatusClass(order.status)}`
+}
+>
+{order.status.replaceAll("_"," ")}
+</span>
+
+</div>
+
+
+<div className="mb-4">
+
+{
+progress.length===0
+?
+(
+<div
+className="border-start border-3 ps-3 mb-3"
+>
+
+<strong>
+{order.status==="BOOKED"?"BOOKED":"BOOKED"}
+</strong>
+
+<div className="text-muted">
+Order created
+</div>
+
+<small>
+{new Date(
+order.createdAt
+).toLocaleString()}
+</small>
+
+</div>
+)
+:
+(
+progress.map(
+(item)=>(
+<div
+key={item._id}
+className="border-start border-3 ps-3 mb-3"
+>
+
+<span
+className={
+`badge ${getStatusClass(item.status)}`
+}
+>
+{
+item.status.replaceAll("_"," ")
+}
+</span>
+
+<div className="text-muted">
+{item.note||"No note"}
+</div>
+
+<small>
+{new Date(
+item.createdAt
+).toLocaleString()}
+</small>
+
+</div>
+)
+)
+)
+}
+
+
+</div>
+
+
+{
+![
+"DELIVERED",
+"CANCELLED"
+].includes(order.status)&&(
+
+<div className="row g-3">
+
+
+<div className="col-md-4">
+
+<label className="form-label">
+New Status
+</label>
+
+
+<select
+className="form-select"
+value={newStatus}
+onChange={
+e=>setNewStatus(
+e.target.value
+)
+}
+>
+
+<option value="">
+Select status
+</option>
+
+<option value="DESIGN_APPROVED">
+Design Approved
+</option>
+
+<option value="IN_PRODUCTION">
+In Production
+</option>
+
+<option value="QUALITY_CHECK">
+Quality Check
+</option>
+
+<option value="READY">
+Ready
+</option>
+
+<option value="DELIVERED">
+Delivered
+</option>
+
+<option value="CANCELLED">
+Cancelled
+</option>
+
+</select>
+
+</div>
+
+
+
+<div className="col-md-5">
+
+<label className="form-label">
+Note
+</label>
+
+<input
+className="form-control"
+value={statusNote}
+onChange={
+e=>setStatusNote(
+e.target.value
+)
+}
+/>
+
+</div>
+
+
+
+<div className="col-md-3 d-flex align-items-end">
+
+<button
+className="btn btn-dark w-100"
+disabled={updatingStatus}
+onClick={handleStatusUpdate}
+>
+{
+updatingStatus
+?
+"Updating..."
+:
+"Update Status"
+}
+</button>
+
+</div>
+
+
+</div>
+
+)
+
+}
+
+
+</div>
+
+</div>
+
 </div>
 
 <div className="col-12">
