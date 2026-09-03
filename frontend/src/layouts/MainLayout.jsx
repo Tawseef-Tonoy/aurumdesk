@@ -75,6 +75,13 @@ function MainLayout() {
           </NavLink>
 
           <NavLink
+            to="/cash-closing"
+            className={getLinkClass}
+            >
+            Cash Closing
+            </NavLink>
+
+          <NavLink
             to="/customer-ledgers"
             className={getLinkClass}
           >

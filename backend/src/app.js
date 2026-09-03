@@ -15,6 +15,7 @@ const supplierRoutes=require("./routes/supplier.routes");
 const purchaseRoutes=require("./routes/purchase.routes");
 const workerRoutes=require("./routes/worker.routes");
 const workerAssignmentRoutes=require("./routes/workerAssignment.routes");
+const cashClosingRoutes=require("./routes/cashClosing.routes");
 
 const emiPlanRoutes = require("./routes/emiPlan.routes");
 const emiInstallmentRoutes = require("./routes/emiInstallment.routes");
@@ -99,6 +100,7 @@ app.use(
 
 app.use("/api/workers",workerRoutes);
 app.use("/api/worker-assignments",workerAssignmentRoutes);
+app.use("/api/cash-closings",cashClosingRoutes);
 
 app.use(
 "/api/suppliers",
