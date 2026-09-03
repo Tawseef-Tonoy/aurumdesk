@@ -150,6 +150,13 @@ function MainLayout() {
           >
             AI EMI Risk Checker
           </NavLink>
+
+          <NavLink
+            to="/monthly-report"
+            className={getLinkClass}
+            >
+            Monthly Owner Report
+            </NavLink>
         </nav>
       </aside>
 

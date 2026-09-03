@@ -63,6 +63,8 @@ import WorkerFormPage from "./features/workers/WorkerFormPage";
 
 import CashClosingPage from "./features/cashClosing/CashClosingPage";
 
+import MonthlyReportPage from "./features/monthlyReport/MonthlyReportPage";
+
 function App() {
   return (
     <Routes>
@@ -290,10 +292,17 @@ function App() {
         <Route path="/workers" element={<WorkersPage/>}/>
         <Route path="/workers/new" element={<WorkerFormPage/>}/>
         <Route path="/cash-closing" element={<CashClosingPage/>}/>
+        
         <Route
           path="*"
           element={<NotFoundPage />}
         />
+
+        <Route
+          path="/monthly-report"
+          element={<MonthlyReportPage/>}
+          />
+
       </Route>
     </Routes>
   );
