@@ -61,6 +61,8 @@ import PurchaseDetailsPage from "./features/purchases/PurchaseDetailsPage";
 import WorkersPage from "./features/workers/WorkersPage";
 import WorkerFormPage from "./features/workers/WorkerFormPage";
 
+import CashClosingPage from "./features/cashClosing/CashClosingPage";
+
 function App() {
   return (
     <Routes>
@@ -287,7 +289,7 @@ function App() {
 
         <Route path="/workers" element={<WorkersPage/>}/>
         <Route path="/workers/new" element={<WorkerFormPage/>}/>
-
+        <Route path="/cash-closing" element={<CashClosingPage/>}/>
         <Route
           path="*"
           element={<NotFoundPage />}
