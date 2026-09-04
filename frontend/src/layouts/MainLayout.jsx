@@ -1,5 +1,4 @@
 import {
-  NavLink,
   Outlet,
   useNavigate,
 } from "react-router-dom";
@@ -7,6 +6,8 @@ import {
 import {
   useAuth,
 } from "../features/auth/AuthContext";
+
+import RoleNavLink from "../features/auth/RoleNavLink";
 
 function MainLayout() {
   const {
@@ -57,137 +58,205 @@ function MainLayout() {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink
+
+          {/* Dashboard */}
+
+          <RoleNavLink
             to="/"
             end
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Dashboard
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* Customers */}
+
+          <RoleNavLink
             to="/customers"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Customers
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* Inventory */}
+
+          <RoleNavLink
             to="/inventory"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Inventory
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* Gold Rates */}
+
+          <RoleNavLink
             to="/gold-rates"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Gold Rates
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
-            to="/expenses"
-            className={
-              getLinkClass
-            }
-          >
-            Expenses
-          </NavLink>
+          {/* Sales */}
 
-          <NavLink
-            to="/payments"
-            className={
-              getLinkClass
-            }
-          >
-            Payments
-          </NavLink>
-
-          <NavLink
+          <RoleNavLink
             to="/sales"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Sales
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* Returns / Exchanges */}
+
+          <RoleNavLink
+            to="/return-exchanges"
+            className={getLinkClass}
+          >
+            Returns / Exchanges
+          </RoleNavLink>
+
+          {/* Customer Payments */}
+
+          <RoleNavLink
+            to="/payments"
+            className={getLinkClass}
+          >
+            Payments
+          </RoleNavLink>
+
+          {/* Customer Due Ledger */}
+
+          <RoleNavLink
+            to="/customer-ledgers"
+            className={getLinkClass}
+          >
+            Customer Due Ledger
+          </RoleNavLink>
+
+          {/* Purchases */}
+
+          <RoleNavLink
+            to="/purchases"
+            className={getLinkClass}
+          >
+            Purchases
+          </RoleNavLink>
+
+          {/* Suppliers */}
+
+          <RoleNavLink
+            to="/suppliers"
+            className={getLinkClass}
+          >
+            Suppliers
+          </RoleNavLink>
+
+          {/* Stock Adjustments */}
+
+          <RoleNavLink
             to="/stock-adjustments"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Stock Adjustments
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* Low Stock */}
+
+          <RoleNavLink
             to="/low-stock-alerts"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Low Stock Alerts
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* Custom Orders */}
+
+          <RoleNavLink
             to="/custom-orders"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             Custom Orders
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* Workers */}
+
+          <RoleNavLink
+            to="/workers"
+            className={getLinkClass}
+          >
+            Workers
+          </RoleNavLink>
+
+          {/* EMI Plans */}
+
+          <RoleNavLink
             to="/emi-plans"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             EMI Plans
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* EMI Installments */}
+
+          <RoleNavLink
             to="/emi-installments"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             EMI Installments
-          </NavLink>
+          </RoleNavLink>
 
-          <NavLink
+          {/* AI EMI Risk */}
+
+          <RoleNavLink
             to="/emi-risk"
-            className={
-              getLinkClass
-            }
+            className={getLinkClass}
           >
             AI EMI Risk Checker
-          </NavLink>
+          </RoleNavLink>
+
+          {/* Expenses */}
+
+          <RoleNavLink
+            to="/expenses"
+            className={getLinkClass}
+          >
+            Expenses
+          </RoleNavLink>
+
+          {/* Cash Closing */}
+
+          <RoleNavLink
+            to="/cash-closing"
+            className={getLinkClass}
+          >
+            Daily Cash Closing
+          </RoleNavLink>
+
+          {/* Monthly Owner Report */}
+
+          <RoleNavLink
+            to="/monthly-report"
+            className={getLinkClass}
+          >
+            Monthly Owner Report
+          </RoleNavLink>
+
         </nav>
       </aside>
 
       <div className="main-panel">
+
+        {/* Top Bar */}
+
         <header className="topbar">
           <div>
             <strong>
-              Jewelry Business
-              Management
+              Jewelry Business Management
             </strong>
           </div>
 
           <div className="d-flex align-items-center gap-3">
             <div className="text-end">
+
               <div className="fw-semibold">
                 {user?.name}
               </div>
@@ -197,23 +266,26 @@ function MainLayout() {
                   user?.role
                 )}
               </small>
+
             </div>
 
             <button
               type="button"
               className="btn btn-outline-dark btn-sm"
-              onClick={
-                handleLogout
-              }
+              onClick={handleLogout}
             >
               Logout
             </button>
+
           </div>
         </header>
+
+        {/* Page Content */}
 
         <main className="page-content">
           <Outlet />
         </main>
+
       </div>
     </div>
   );

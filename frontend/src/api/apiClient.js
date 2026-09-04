@@ -1,5 +1,8 @@
 import axios from "axios";
 
+const TOKEN_KEY =
+  "aurumdesk_auth_token";
+
 const apiClient = axios.create({
   baseURL:
     import.meta.env.VITE_API_URL ||
@@ -8,20 +11,68 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-
-  timeout: 15000,
 });
+
+/*
+|--------------------------------------------------------------------------
+| Attach JWT to every request
+|--------------------------------------------------------------------------
+*/
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token =
+      localStorage.getItem(
+        TOKEN_KEY
+      );
+
+    if (token) {
+      config.headers.Authorization =
+        `Bearer ${token}`;
+    }
+
+    return config;
+  },
+
+  (error) =>
+    Promise.reject(error)
+);
+
+/*
+|--------------------------------------------------------------------------
+| Handle expired / invalid sessions
+|--------------------------------------------------------------------------
+*/
 
 apiClient.interceptors.response.use(
   (response) => response,
 
   (error) => {
-    const message =
-      error.response?.data?.message ||
-      error.message ||
-      "Something went wrong";
+    const status =
+      error.response?.status;
 
-    return Promise.reject(new Error(message));
+    const url =
+      error.config?.url || "";
+
+    if (
+      status === 401 &&
+      !url.includes("/auth/login")
+    ) {
+      localStorage.removeItem(
+        TOKEN_KEY
+      );
+
+      if (
+        window.location.pathname !==
+        "/login"
+      ) {
+        window.location.assign(
+          "/login"
+        );
+      }
+    }
+
+    return Promise.reject(error);
   }
 );
 
